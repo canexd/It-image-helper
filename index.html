@@ -297,6 +297,12 @@ tbody td{padding:11px 12px;color:var(--text2)}
 </div>
 <div class="form-row c2">
 <div class="field"><label>Imaging Tech</label><select id="bulk-tech"><option value="">-- Select --</option></select></div>
+<div class="field"><label>Quick-Add Tech</label>
+<div style="display:flex;gap:6px">
+<input type="text" id="bulk-new-tech" placeholder="New tech name" style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:9px 12px;color:var(--text);outline:none;font-size:13px" onkeydown="if(event.key==='Enter')bulkAddTech()">
+<button class="btn btn-green btn-sm" onclick="bulkAddTech()">+ Add</button>
+</div>
+</div>
 </div>
 </div>
 <div class="bulk-grid" id="bulk-grid">
@@ -356,16 +362,17 @@ tbody td{padding:11px 12px;color:var(--text2)}
 
 <!-- QUICK TOOLS -->
 <div class="tab-panel" id="tab-tools">
-<div class="grid-2">
-<div>
-<div class="tool-box">
-<h3>🖥 Rename Script Generator</h3>
+
+<!-- Row 1: Rename + Domain Join -->
+<div class="grid-2" style="margin-bottom:16px">
+<div class="tool-box" style="margin-bottom:0">
+<h3>🖥 Rename Computer</h3>
 <div class="field" style="margin-bottom:10px"><label>Device Name</label><input type="text" id="tool-rename" placeholder="DEPT00123L" oninput="updateRename()"></div>
 <div class="code-block" id="rename-out"></div>
 <button class="btn btn-secondary btn-sm" style="margin-top:8px" onclick="copyText(document.getElementById('rename-out').textContent)">Copy</button>
 </div>
-<div class="tool-box">
-<h3>🔗 Domain Join Script Generator</h3>
+<div class="tool-box" style="margin-bottom:0">
+<h3>🔗 Domain Join</h3>
 <div class="form-row c2">
 <div class="field"><label>Domain Name</label><input type="text" id="tool-domain" value="county.local" oninput="updateDomain()"></div>
 <div class="field"><label>Department OU</label>
@@ -376,7 +383,126 @@ tbody td{padding:11px 12px;color:var(--text2)}
 <button class="btn btn-secondary btn-sm" style="margin-top:8px" onclick="copyText(document.getElementById('domain-out').textContent)">Copy</button>
 </div>
 </div>
-<div>
+
+<!-- Row 2: GPUpdate + AD User Lookup -->
+<div class="grid-2" style="margin-bottom:16px">
+<div class="tool-box" style="margin-bottom:0">
+<h3>🔄 Force Group Policy Update</h3>
+<div class="form-row c2">
+<div class="field"><label>Target</label>
+<select id="gp-target" onchange="updateGP()">
+<option value="local">Local Computer</option>
+<option value="remote">Remote Computer</option>
+</select>
+</div>
+<div class="field" id="gp-remote-field" style="display:none"><label>Computer Name</label><input type="text" id="gp-computer" placeholder="DEPT00123L" oninput="updateGP()"></div>
+</div>
+<div class="code-block" id="gp-out"></div>
+<button class="btn btn-secondary btn-sm" style="margin-top:8px" onclick="copyText(document.getElementById('gp-out').textContent)">Copy</button>
+</div>
+<div class="tool-box" style="margin-bottom:0">
+<h3>👤 AD User Lookup</h3>
+<div class="form-row c2">
+<div class="field"><label>Username (samAccountName)</label><input type="text" id="ad-user" placeholder="jsmith" oninput="updateADUser()"></div>
+<div class="field"><label>Domain Controller (optional)</label><input type="text" id="ad-dc" placeholder="dc01.county.local" oninput="updateADUser()"></div>
+</div>
+<div class="code-block" id="ad-user-out"></div>
+<button class="btn btn-secondary btn-sm" style="margin-top:8px" onclick="copyText(document.getElementById('ad-user-out').textContent)">Copy</button>
+</div>
+</div>
+
+<!-- Row 3: Clear Print Spooler + Flush DNS -->
+<div class="grid-2" style="margin-bottom:16px">
+<div class="tool-box" style="margin-bottom:0">
+<h3>🖨 Clear Print Spooler</h3>
+<div class="form-row c2">
+<div class="field"><label>Target</label>
+<select id="spool-target" onchange="updateSpooler()">
+<option value="local">Local Computer</option>
+<option value="remote">Remote Computer</option>
+</select>
+</div>
+<div class="field" id="spool-remote-field" style="display:none"><label>Computer Name</label><input type="text" id="spool-computer" placeholder="DEPT00123L" oninput="updateSpooler()"></div>
+</div>
+<div class="code-block" id="spool-out"></div>
+<button class="btn btn-secondary btn-sm" style="margin-top:8px" onclick="copyText(document.getElementById('spool-out').textContent)">Copy</button>
+</div>
+<div class="tool-box" style="margin-bottom:0">
+<h3>🌐 Flush DNS &amp; Reset Network</h3>
+<div class="form-row c2">
+<div class="field"><label>Target</label>
+<select id="dns-target" onchange="updateDNS()">
+<option value="local">Local Computer</option>
+<option value="remote">Remote Computer</option>
+</select>
+</div>
+<div class="field" id="dns-remote-field" style="display:none"><label>Computer Name</label><input type="text" id="dns-computer" placeholder="DEPT00123L" oninput="updateDNS()"></div>
+</div>
+<div class="code-block" id="dns-out"></div>
+<button class="btn btn-secondary btn-sm" style="margin-top:8px" onclick="copyText(document.getElementById('dns-out').textContent)">Copy</button>
+</div>
+</div>
+
+<!-- Row 4: Get Computer Info + Get Logged In User -->
+<div class="grid-2" style="margin-bottom:16px">
+<div class="tool-box" style="margin-bottom:0">
+<h3>💻 Get Computer Info</h3>
+<div class="field" style="margin-bottom:10px"><label>Computer Name (blank = local)</label><input type="text" id="compinfo-computer" placeholder="DEPT00123L or leave blank" oninput="updateCompInfo()"></div>
+<div class="code-block" id="compinfo-out"></div>
+<button class="btn btn-secondary btn-sm" style="margin-top:8px" onclick="copyText(document.getElementById('compinfo-out').textContent)">Copy</button>
+</div>
+<div class="tool-box" style="margin-bottom:0">
+<h3>👁 Get Logged-In User</h3>
+<div class="field" style="margin-bottom:10px"><label>Computer Name</label><input type="text" id="loggedin-computer" placeholder="DEPT00123L" oninput="updateLoggedIn()"></div>
+<div class="code-block" id="loggedin-out"></div>
+<button class="btn btn-secondary btn-sm" style="margin-top:8px" onclick="copyText(document.getElementById('loggedin-out').textContent)">Copy</button>
+</div>
+</div>
+
+<!-- Row 5: Map Network Drive + Check Disk Space -->
+<div class="grid-2" style="margin-bottom:16px">
+<div class="tool-box" style="margin-bottom:0">
+<h3>📁 Map Network Drive</h3>
+<div class="form-row c3">
+<div class="field"><label>Drive Letter</label>
+<select id="drive-letter" onchange="updateDrive()" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:9px 12px;color:var(--text);outline:none">
+${['G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'].map(l=>`<option value="${l}">${l}:</option>`).join('')}
+</select>
+</div>
+<div class="field" style="grid-column:span 2"><label>UNC Path</label><input type="text" id="drive-path" placeholder="\\\\server\\share" oninput="updateDrive()"></div>
+</div>
+<div class="toggle-wrap" style="margin-bottom:10px"><label class="toggle"><input type="checkbox" id="drive-persist" onchange="updateDrive()" checked><span class="toggle-slider"></span></label><span style="font-size:12px;color:var(--text2)">Persistent (survives reboot)</span></div>
+<div class="code-block" id="drive-out"></div>
+<button class="btn btn-secondary btn-sm" style="margin-top:8px" onclick="copyText(document.getElementById('drive-out').textContent)">Copy</button>
+</div>
+<div class="tool-box" style="margin-bottom:0">
+<h3>💾 Check Disk Space</h3>
+<div class="field" style="margin-bottom:10px"><label>Computer Name (blank = local)</label><input type="text" id="disk-computer" placeholder="DEPT00123L or leave blank" oninput="updateDisk()"></div>
+<div class="code-block" id="disk-out"></div>
+<button class="btn btn-secondary btn-sm" style="margin-top:8px" onclick="copyText(document.getElementById('disk-out').textContent)">Copy</button>
+</div>
+</div>
+
+<!-- Row 6: Enable RDP + Set AD Computer Description -->
+<div class="grid-2" style="margin-bottom:16px">
+<div class="tool-box" style="margin-bottom:0">
+<h3>🖥 Enable Remote Desktop</h3>
+<div class="field" style="margin-bottom:10px"><label>Computer Name (blank = local)</label><input type="text" id="rdp-computer" placeholder="DEPT00123L or leave blank" oninput="updateRDP()"></div>
+<div class="code-block" id="rdp-out"></div>
+<button class="btn btn-secondary btn-sm" style="margin-top:8px" onclick="copyText(document.getElementById('rdp-out').textContent)">Copy</button>
+</div>
+<div class="tool-box" style="margin-bottom:0">
+<h3>🏷 Set AD Computer Description</h3>
+<div class="form-row c2">
+<div class="field"><label>Computer Name</label><input type="text" id="addesc-computer" placeholder="DEPT00123L" oninput="updateADDesc()"></div>
+<div class="field"><label>Description</label><input type="text" id="addesc-text" placeholder="John Smith - Assessors" oninput="updateADDesc()"></div>
+</div>
+<div class="code-block" id="addesc-out"></div>
+<button class="btn btn-secondary btn-sm" style="margin-top:8px" onclick="copyText(document.getElementById('addesc-out').textContent)">Copy</button>
+</div>
+</div>
+
+<!-- Device Finder -->
 <div class="tool-box">
 <h3>🔍 Device Finder</h3>
 <div class="form-row c2">
@@ -394,8 +520,7 @@ tbody td{padding:11px 12px;color:var(--text2)}
 </div>
 <div id="finder-results"></div>
 </div>
-</div>
-</div>
+
 </div>
 
 <!-- EXPORTS -->
@@ -666,7 +791,7 @@ function typeCode(t){return t==='Laptop'?'L':t==='Tablet'?'T':''}
 function getPrefix(deptName,subId){
   const dept=departments.find(x=>x.name===deptName);
   if(!dept)return'';
-  if(subId){const sub=(dept.subdepts||[]).find(x=>x.id===subId);if(sub?.prefix)return sub.prefix}
+  if(subId){const sub=(dept.subdepts||[]).find(x=>x.id===subId);if(sub?.prefix)return(dept.prefix||'')+sub.prefix}
   return dept.prefix||'';
 }
 
@@ -683,7 +808,8 @@ function techOpts(sel=''){
 
 function subOpts(deptName,sel=''){
   const dept=departments.find(x=>x.name===deptName);
-  return`<option value="">-- None (dept prefix) --</option>`+(dept?.subdepts||[]).map(s=>`<option value="${esc(s.id)}"${s.id===sel?' selected':''}>${esc(s.name)} [${esc(s.prefix)}]</option>`).join('');
+  const dPrefix=dept?.prefix||'';
+  return`<option value="">-- None (prefix: ${esc(dPrefix)}) --</option>`+(dept?.subdepts||[]).map(s=>`<option value="${esc(s.id)}"${s.id===sel?' selected':''}>${esc(s.name)} [${esc(dPrefix+s.prefix)}]</option>`).join('');
 }
 
 function renderDashboard(){
@@ -888,14 +1014,16 @@ ${subs.length?`
 ${subs.map(s=>`<div class="subdept-row">
 <span style="color:var(--text3);font-family:var(--mono);font-size:12px;width:16px;flex-shrink:0">↳</span>
 <span style="flex:1;font-size:13px;font-weight:500">${esc(s.name)}</span>
-<span style="font-family:var(--mono);font-size:12px;color:var(--accent2);margin-right:12px">Prefix: ${esc(s.prefix)}</span>
-<span style="font-family:var(--mono);font-size:12px;color:var(--green);margin-right:14px">→ ${esc(prev(s.prefix))}</span>
+<span style="font-family:var(--mono);font-size:12px;color:var(--text3);margin-right:6px">+${esc(s.prefix)}</span>
+<span style="font-family:var(--mono);font-size:12px;color:var(--accent2);margin-right:12px">Combined: ${esc(d.prefix+s.prefix)}</span>
+<span style="font-family:var(--mono);font-size:12px;color:var(--green);margin-right:14px">→ ${esc(prev(d.prefix+s.prefix))}</span>
 <button class="btn btn-danger btn-xs" onclick="delSubdept('${esc(d.id)}','${esc(s.id)}')">Del</button>
 </div>`).join('')}
 </div>`:''}
 <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(37,45,61,0.5);display:flex;gap:6px;align-items:center;flex-wrap:wrap">
 <input type="text" id="sn-${esc(d.id)}" placeholder="Sub-dept name (e.g. Appraisers)" style="flex:1;min-width:160px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:7px 11px;color:var(--text);outline:none;font-size:13px" onkeydown="if(event.key==='Enter')addSubdept('${esc(d.id)}')">
-<input type="text" id="sp-${esc(d.id)}" placeholder="Prefix e.g. AP" maxlength="6" style="width:110px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:7px 11px;color:var(--accent2);outline:none;font-size:13px;font-family:var(--mono);font-weight:700;text-transform:uppercase" oninput="this.value=this.value.toUpperCase()">
+<input type="text" id="sp-${esc(d.id)}" placeholder="Extra letters e.g. AP" maxlength="6" title="These letters are appended to the root prefix. Assessors(A) + AP = AAP" style="width:130px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:7px 11px;color:var(--accent2);outline:none;font-size:13px;font-family:var(--mono);font-weight:700;text-transform:uppercase" oninput="this.value=this.value.toUpperCase();document.getElementById('sp-prev-${esc(d.id)}').textContent=this.value?'→ '+'${esc(d.prefix)}'+this.value:''">
+<span id="sp-prev-${esc(d.id)}" style="font-family:var(--mono);font-size:12px;color:var(--green);white-space:nowrap"></span>
 <button class="btn btn-green btn-xs" onclick="addSubdept('${esc(d.id)}')">+ Add Sub-Dept</button>
 </div>
 </div>`;}).join('');
@@ -1077,6 +1205,21 @@ function clearBulk(){
   bulkRows=[];renderBulkRows();
 }
 
+function bulkAddTech(){
+  const inp=document.getElementById('bulk-new-tech');
+  const name=inp?.value.trim();
+  if(!name){toast('Enter a tech name','err');return}
+  if(techs.find(t=>t.name===name)){toast('Tech already exists','err');return}
+  techs.push({id:uid(),name});
+  save();
+  const sel=document.getElementById('bulk-tech');
+  const opt=document.createElement('option');
+  opt.value=name;opt.textContent=name;opt.selected=true;
+  sel.appendChild(opt);
+  inp.value='';
+  toast(`Tech "${name}" added`);
+}
+
 function renderScripts(){
   const q=(document.getElementById('script-search').value||'').toLowerCase();
   const cat=document.getElementById('script-cat').value;
@@ -1196,7 +1339,7 @@ function delKb(id){if(!confirm('Delete?'))return;knowledge=knowledge.filter(x=>x
 function renderTools(){
   document.getElementById('tool-ou').innerHTML=`<option value="">-- Select --</option>`+departments.map(d=>`<option value="${esc(d.name)}">${esc(d.name)}</option>`).join('');
   document.getElementById('finder-dept').innerHTML=`<option value="">All</option>`+departments.map(d=>`<option value="${esc(d.name)}">${esc(d.name)}</option>`).join('');
-  updateRename();updateDomain();runFinder();
+  updateRename();updateDomain();updateGP();updateADUser();updateSpooler();updateDNS();updateCompInfo();updateLoggedIn();updateDrive();updateDisk();updateRDP();updateADDesc();runFinder();
 }
 
 function updateRename(){
@@ -1209,6 +1352,110 @@ function updateDomain(){
   const dept=document.getElementById('tool-ou').value||'DEPARTMENT';
   const dc=domain.split('.').map(p=>`DC=${p}`).join(',');
   document.getElementById('domain-out').textContent=`Add-Computer -DomainName "${domain}" -OUPath "OU=${dept},OU=Departments,${dc}"`;
+}
+
+function updateGP(){
+  const target=document.getElementById('gp-target').value;
+  const rf=document.getElementById('gp-remote-field');
+  rf.style.display=target==='remote'?'':'none';
+  const computer=document.getElementById('gp-computer').value.trim();
+  let script;
+  if(target==='remote'&&computer){
+    script=`Invoke-Command -ComputerName "${computer}" -ScriptBlock { gpupdate /force }`;
+  }else{
+    script=`gpupdate /force`;
+  }
+  document.getElementById('gp-out').textContent=script;
+}
+
+function updateADUser(){
+  const user=document.getElementById('ad-user').value.trim()||'USERNAME';
+  const dc=document.getElementById('ad-dc').value.trim();
+  const props=`Name,SamAccountName,EmailAddress,Title,Department,Office,Enabled,LockedOut,LastLogonDate,PasswordLastSet,PasswordExpired`;
+  let script=`Get-ADUser -Identity "${user}" -Properties * | Select-Object ${props} | Format-List`;
+  if(dc)script=`Get-ADUser -Identity "${user}" -Server "${dc}" -Properties * | Select-Object ${props} | Format-List`;
+  document.getElementById('ad-user-out').textContent=script;
+}
+
+function updateSpooler(){
+  const target=document.getElementById('spool-target').value;
+  const rf=document.getElementById('spool-remote-field');
+  rf.style.display=target==='remote'?'':'none';
+  const computer=document.getElementById('spool-computer').value.trim();
+  const block=`Stop-Service -Name Spooler -Force
+Remove-Item "$env:SystemRoot\\System32\\spool\\PRINTERS\\*" -Force -Recurse -ErrorAction SilentlyContinue
+Start-Service -Name Spooler
+Write-Host "Print spooler cleared and restarted." -ForegroundColor Green`;
+  let script;
+  if(target==='remote'&&computer){
+    script=`Invoke-Command -ComputerName "${computer}" -ScriptBlock {\n${block.split('\n').map(l=>'  '+l).join('\n')}\n}`;
+  }else{
+    script=block;
+  }
+  document.getElementById('spool-out').textContent=script;
+}
+
+function updateDNS(){
+  const target=document.getElementById('dns-target').value;
+  const rf=document.getElementById('dns-remote-field');
+  rf.style.display=target==='remote'?'':'none';
+  const computer=document.getElementById('dns-computer').value.trim();
+  const block=`ipconfig /flushdns
+ipconfig /release
+ipconfig /renew
+netsh winsock reset
+Write-Host "DNS flushed and network reset. Reboot recommended." -ForegroundColor Green`;
+  let script;
+  if(target==='remote'&&computer){
+    script=`Invoke-Command -ComputerName "${computer}" -ScriptBlock {\n${block.split('\n').map(l=>'  '+l).join('\n')}\n}`;
+  }else{
+    script=block;
+  }
+  document.getElementById('dns-out').textContent=script;
+}
+
+function updateCompInfo(){
+  const c=document.getElementById('compinfo-computer').value.trim();
+  const props=`CsName,WindowsProductName,WindowsVersion,OsArchitecture,CsTotalPhysicalMemory,CsProcessors,BiosSerialNumber,OsLastBootUpTime`;
+  let script;
+  if(c){
+    script=`Invoke-Command -ComputerName "${c}" -ScriptBlock {\n  Get-ComputerInfo | Select-Object ${props} | Format-List\n}`;
+  }else{
+    script=`Get-ComputerInfo | Select-Object ${props} | Format-List`;
+  }
+  document.getElementById('compinfo-out').textContent=script;
+}
+
+function updateLoggedIn(){
+  const c=document.getElementById('loggedin-computer').value.trim()||'COMPUTERNAME';
+  document.getElementById('loggedin-out').textContent=`(Get-WmiObject -Class Win32_ComputerSystem -ComputerName "${c}").UserName`;
+}
+
+function updateDrive(){
+  const letter=document.getElementById('drive-letter').value||'G';
+  const path=document.getElementById('drive-path').value.trim()||'\\\\server\\share';
+  const persist=document.getElementById('drive-persist').checked;
+  document.getElementById('drive-out').textContent=`New-PSDrive -Name "${letter}" -PSProvider FileSystem -Root "${path}"${persist?' -Persist':''}\n# Or using net use:\nnet use ${letter}: "${path}"${persist?' /persistent:yes':''}`;
+}
+
+function updateDisk(){
+  const c=document.getElementById('disk-computer').value.trim();
+  const block=`Get-PSDrive -PSProvider FileSystem | Select-Object Name,@{N='Used(GB)';E={[math]::Round($_.Used/1GB,1)}},@{N='Free(GB)';E={[math]::Round($_.Free/1GB,1)}},@{N='Total(GB)';E={[math]::Round(($_.Used+$_.Free)/1GB,1)}} | Format-Table -AutoSize`;
+  document.getElementById('disk-out').textContent=c?`Invoke-Command -ComputerName "${c}" -ScriptBlock {\n  ${block}\n}`:block;
+}
+
+function updateRDP(){
+  const c=document.getElementById('rdp-computer').value.trim();
+  const block=`Set-ItemProperty -Path 'HKLM:\\System\\CurrentControlSet\\Control\\Terminal Server' -Name "fDenyTSConnections" -Value 0
+Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+Write-Host "RDP enabled." -ForegroundColor Green`;
+  document.getElementById('rdp-out').textContent=c?`Invoke-Command -ComputerName "${c}" -ScriptBlock {\n${block.split('\n').map(l=>'  '+l).join('\n')}\n}`:block;
+}
+
+function updateADDesc(){
+  const computer=document.getElementById('addesc-computer').value.trim()||'COMPUTERNAME';
+  const desc=document.getElementById('addesc-text').value.trim()||'Description here';
+  document.getElementById('addesc-out').textContent=`Set-ADComputer -Identity "${computer}" -Description "${desc}"`;
 }
 
 function runFinder(){
