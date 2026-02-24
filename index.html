@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TechOps Companion</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+:root{
+--bg:#0a0c10;--bg2:#0f1218;--bg3:#161b24;--bg4:#1e2533;
+--border:#252d3d;--border2:#2e3a50;
+--accent:#3b82f6;--accent2:#60a5fa;--accent-glow:rgba(59,130,246,0.15);
+--green:#10b981;--green-dim:rgba(16,185,129,0.1);
+--red:#ef4444;--red-dim:rgba(239,68,68,0.1);
+--yellow:#f59e0b;--yellow-dim:rgba(245,158,11,0.1);
+--purple:#8b5cf6;--cyan:#06b6d4;
+--text:#e2e8f0;--text2:#94a3b8;--text3:#64748b;
+--mono:'JetBrains Mono',monospace;--sans:'DM Sans',sans-serif;
+--radius:8px;--radius2:12px;--sidebar:228px;--trans:0.18s ease;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;overflow:hidden}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+input,select,textarea,button{font-family:var(--sans);font-size:14px}
+
+#login-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:1000}
+.login-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);padding:48px 40px;width:360px;text-align:center}
+.login-logo{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--accent);text-transform:uppercase;margin-bottom:32px}
+.login-logo span{display:block;font-size:24px;letter-spacing:0;color:var(--text);font-weight:700;margin-top:8px}
+.login-card h2{font-size:18px;font-weight:600;margin-bottom:6px}
+.login-card p{color:var(--text2);font-size:13px;margin-bottom:28px}
+.login-field{margin-bottom:16px}
+.login-field input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;color:var(--text);outline:none;transition:border-color var(--trans)}
+.login-field input:focus{border-color:var(--accent)}
+.login-err{color:var(--red);font-size:12px;margin-bottom:12px;min-height:18px}
+
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:var(--radius);border:none;cursor:pointer;font-weight:500;transition:all var(--trans);white-space:nowrap}
+.btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{background:var(--accent2)}
+.btn-secondary{background:var(--bg4);color:var(--text2);border:1px solid var(--border)}.btn-secondary:hover{background:var(--border);color:var(--text)}
+.btn-danger{background:var(--red-dim);color:var(--red);border:1px solid rgba(239,68,68,0.2)}.btn-danger:hover{background:var(--red);color:#fff}
+.btn-green{background:var(--green-dim);color:var(--green);border:1px solid rgba(16,185,129,0.2)}.btn-green:hover{background:var(--green);color:#fff}
+.btn-sm{padding:5px 12px;font-size:13px}.btn-xs{padding:3px 8px;font-size:12px}
+.btn-full{width:100%;justify-content:center}
+
+#app{display:flex;height:100vh;opacity:0;transition:opacity 0.3s}
+#app.visible{opacity:1}
+#sidebar{width:var(--sidebar);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden}
+.sidebar-header{padding:20px 16px 16px;border-bottom:1px solid var(--border)}
+.sidebar-logo{font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--accent);text-transform:uppercase}
+.sidebar-logo span{display:block;font-size:15px;letter-spacing:0;color:var(--text);font-weight:700;margin-top:4px;line-height:1.2}
+.sidebar-nav{flex:1;overflow-y:auto;padding:10px 8px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--radius);color:var(--text2);cursor:pointer;transition:all var(--trans);margin-bottom:2px;font-size:13.5px;font-weight:500;white-space:nowrap}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:var(--accent-glow);color:var(--accent2);border-left:2px solid var(--accent)}
+.nav-item svg{flex-shrink:0;opacity:0.7}.nav-item.active svg{opacity:1}
+.sidebar-footer{padding:12px 8px;border-top:1px solid var(--border)}
+
+#main{flex:1;overflow:hidden;display:flex;flex-direction:column}
+#topbar{height:54px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 20px;flex-shrink:0}
+.topbar-title{font-weight:600;font-size:16px}
+#content{flex:1;overflow-y:auto;padding:20px}
+.tab-panel{display:none;animation:fadeIn 0.2s ease}.tab-panel.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);padding:20px;margin-bottom:16px}
+.card-title{font-size:13px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:14px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);padding:20px;position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;right:0;width:60px;height:60px;border-radius:0 0 0 60px;opacity:0.08}
+.stat-card.blue::before{background:var(--accent)}.stat-card.green::before{background:var(--green)}
+.stat-card.yellow::before{background:var(--yellow)}.stat-card.purple::before{background:var(--purple)}
+.stat-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.1em;font-family:var(--mono)}
+.stat-val{font-size:28px;font-weight:700;margin:6px 0 2px;font-family:var(--mono)}
+.stat-sub{font-size:12px;color:var(--text3)}
+
+.form-row{display:grid;gap:12px;margin-bottom:12px}
+.form-row.c2{grid-template-columns:1fr 1fr}
+.form-row.c3{grid-template-columns:1fr 1fr 1fr}
+.form-row.c4{grid-template-columns:1fr 1fr 1fr 1fr}
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:12px;font-weight:500;color:var(--text2)}
+.field input,.field select,.field textarea{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:9px 12px;color:var(--text);outline:none;transition:border-color var(--trans)}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent)}
+.field select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:30px}
+.field textarea{resize:vertical;min-height:80px}
+.field input:disabled,.field select:disabled{opacity:0.4;cursor:not-allowed}
+
+.toggle-wrap{display:flex;align-items:center;gap:10px}
+.toggle{position:relative;width:38px;height:20px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;inset:0;background:var(--bg4);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:all var(--trans)}
+.toggle-slider::before{content:'';position:absolute;width:14px;height:14px;border-radius:50%;background:var(--text3);top:2px;left:2px;transition:all var(--trans)}
+.toggle input:checked+.toggle-slider{background:var(--accent);border-color:var(--accent)}
+.toggle input:checked+.toggle-slider::before{transform:translateX(18px);background:#fff}
+
+.search-bar{display:flex;align-items:center;gap:10px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:8px 12px;margin-bottom:16px}
+.search-bar svg{color:var(--text3);flex-shrink:0}
+.search-bar input{flex:1;background:none;border:none;outline:none;color:var(--text)}
+.search-bar input::placeholder{color:var(--text3)}
+
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead tr{border-bottom:1px solid var(--border)}
+thead th{padding:10px 12px;text-align:left;font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em}
+tbody tr{border-bottom:1px solid rgba(37,45,61,0.5);transition:background var(--trans)}
+tbody tr:hover{background:var(--bg3);cursor:pointer}
+tbody td{padding:11px 12px;color:var(--text2)}
+
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;font-family:var(--mono)}
+.bg{background:var(--green-dim);color:var(--green)}
+.by{background:var(--yellow-dim);color:var(--yellow)}
+.br{background:var(--red-dim);color:var(--red)}
+.bb{background:var(--accent-glow);color:var(--accent2)}
+.bp{background:rgba(139,92,246,0.1);color:var(--purple)}
+.bc{background:rgba(6,182,212,0.1);color:var(--cyan)}
+
+.drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:500;opacity:0;pointer-events:none;transition:opacity var(--trans)}
+.drawer-overlay.open{opacity:1;pointer-events:all}
+.drawer{position:fixed;right:-600px;top:0;bottom:0;width:600px;background:var(--bg2);border-left:1px solid var(--border);z-index:501;overflow:hidden;transition:right 0.25s ease;display:flex;flex-direction:column}
+.drawer.open{right:0}
+.drawer-header{padding:18px 24px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.drawer-header h3{font-size:15px;font-weight:700;font-family:var(--mono);color:var(--accent2);letter-spacing:0.04em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:80%}
+.drawer-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0}
+.dtab{padding:11px 18px;font-size:13px;font-weight:500;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:all var(--trans)}
+.dtab:hover{color:var(--text2);background:var(--bg3)}
+.dtab.active{color:var(--accent2);border-bottom-color:var(--accent)}
+.drawer-body{padding:20px 24px;flex:1;overflow-y:auto}
+.d-actions{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.detail-row{display:flex;justify-content:space-between;align-items:flex-start;padding:9px 0;border-bottom:1px solid rgba(37,45,61,0.5)}
+.dl{font-size:12px;color:var(--text3);font-family:var(--mono);flex-shrink:0;padding-right:12px}
+.dv{font-size:13px;color:var(--text);font-weight:500;text-align:right;max-width:65%;word-break:break-word}
+.mono{font-family:var(--mono)}
+.code-block{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;font-family:var(--mono);font-size:12px;color:var(--green);white-space:pre-wrap;word-break:break-all}
+
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:600;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity var(--trans)}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);padding:28px;width:560px;max-width:92vw;max-height:88vh;overflow-y:auto;transform:scale(0.95);transition:transform var(--trans)}
+.modal-overlay.open .modal{transform:scale(1)}
+.modal-title{font-size:17px;font-weight:600;margin-bottom:20px}
+.modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}
+
+.bulk-grid{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);overflow:hidden}
+.bulk-row{display:grid;grid-template-columns:120px 130px 1fr 180px 80px;border-bottom:1px solid var(--border)}
+.bulk-row.hdr{background:var(--bg3)}
+.bulk-row.hdr span{padding:10px 12px;font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;display:block}
+.bulk-row input{background:transparent;border:none;border-right:1px solid var(--border);outline:none;padding:10px 12px;color:var(--text);width:100%;font-size:13px}
+.bulk-row input:focus{background:var(--accent-glow)}
+.gname{display:flex;align-items:center;padding:0 12px;border-right:1px solid var(--border);font-family:var(--mono);font-size:12px;color:var(--accent2)}
+.rsave{display:flex;align-items:center;justify-content:center}
+.bulk-row.locked{background:rgba(16,185,129,0.03)}
+.bulk-row.locked input{pointer-events:none;color:var(--text3)}
+
+.tag{display:inline-flex;align-items:center;background:var(--bg4);border:1px solid var(--border);border-radius:4px;padding:2px 8px;font-size:11px;color:var(--text3);gap:4px;margin:2px}
+.tag-x{cursor:pointer;color:var(--text3);font-size:14px;line-height:1}.tag-x:hover{color:var(--red)}
+.tags-wrap{display:flex;flex-wrap:wrap;gap:4px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:6px 10px;cursor:text;min-height:42px}
+.tags-wrap input{flex:1;min-width:80px;background:none;border:none;outline:none;color:var(--text);font-size:13px;padding:2px 0}
+
+.script-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);padding:16px;margin-bottom:10px;transition:border-color var(--trans)}
+.script-card:hover{border-color:var(--border2)}
+.script-card.pinned{border-color:rgba(245,158,11,0.3);background:rgba(245,158,11,0.02)}
+.kb-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);padding:16px;margin-bottom:10px;cursor:pointer;transition:border-color var(--trans)}
+.kb-card:hover{border-color:var(--border2)}
+.kb-body{font-size:13px;color:var(--text2);line-height:1.6;margin:8px 0;max-height:80px;overflow:hidden;mask-image:linear-gradient(to bottom,black 60%,transparent)}
+.kb-body.expanded{max-height:none;mask-image:none}
+.hl{background:rgba(245,158,11,0.3);border-radius:2px;padding:0 2px}
+
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.section-title{font-size:16px;font-weight:600}
+.empty{text-align:center;padding:48px 20px;color:var(--text3);font-size:14px}
+
+.tool-box{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);padding:20px;margin-bottom:16px}
+.tool-box h3{font-size:14px;font-weight:600;margin-bottom:14px}
+
+.fsel{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:7px 28px 7px 10px;color:var(--text2);outline:none;font-size:13px;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center}
+.date-inp{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:7px 10px;color:var(--text2);outline:none;font-size:13px}
+
+.toast{position:fixed;bottom:24px;right:24px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:12px 16px;font-size:13px;z-index:900;transform:translateY(80px);opacity:0;transition:all 0.25s ease;max-width:320px}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.ok{border-color:rgba(16,185,129,0.4);color:var(--green)}
+.toast.err{border-color:rgba(239,68,68,0.4);color:var(--red)}
+
+.timeline{position:relative;padding-left:22px}
+.timeline::before{content:'';position:absolute;left:6px;top:4px;bottom:0;width:1px;background:var(--border2)}
+.tl-item{position:relative;margin-bottom:16px}
+.tl-item::before{content:'';position:absolute;left:-19px;top:4px;width:8px;height:8px;border-radius:50%;background:var(--accent);border:2px solid var(--bg2)}
+.tl-meta{font-size:11px;color:var(--text3);font-family:var(--mono);margin-bottom:5px}
+.tl-body{font-size:13px;color:var(--text2);background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;line-height:1.55}
+
+.cl-item{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-bottom:1px solid rgba(37,45,61,0.5);transition:background var(--trans)}
+.cl-item:hover{background:rgba(255,255,255,0.02)}
+.cl-item:last-child{border-bottom:none}
+.cl-cb{width:16px;height:16px;accent-color:var(--green);cursor:pointer;flex-shrink:0;margin-top:2px}
+.cl-label{font-size:13px;color:var(--text2)}.cl-label.done{text-decoration:line-through;color:var(--text3)}
+.cl-who{font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:3px}
+.prog-wrap{height:6px;background:var(--bg4);border-radius:3px;margin-bottom:14px;overflow:hidden}
+.prog-bar{height:100%;background:var(--green);border-radius:3px;transition:width 0.3s ease}
+
+.subdept-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid rgba(37,45,61,0.4)}
+.subdept-row:last-child{border-bottom:none}
+
+@media(max-width:768px){
+#sidebar{position:fixed;left:-240px;top:0;bottom:0;z-index:400;transition:left var(--trans)}
+#sidebar.open{left:0}
+.grid-4,.grid-2{grid-template-columns:1fr}
+.form-row.c2,.form-row.c3,.form-row.c4{grid-template-columns:1fr}
+.drawer{width:100vw;right:-100vw}
+.bulk-row{grid-template-columns:100px 110px 1fr 140px 70px}
+}
+</style>
+</head>
+<body>
+
+<div id="login-screen">
+<div class="login-card">
+<div class="login-logo">IT Operations<span>TechOps<br>Companion</span></div>
+<h2>Sign In</h2>
+<p>Enter your access password to continue</p>
+<div class="login-field"><input type="password" id="login-pass" placeholder="Password"></div>
+<div class="login-err" id="login-err"></div>
+<button class="btn btn-primary btn-full" onclick="doLogin()">Continue</button>
+</div>
+</div>
+
+<div id="app">
+<div id="sidebar">
+<div class="sidebar-header">
+<div class="sidebar-logo">TechOps<span>Companion<br>v2.1</span></div>
+</div>
+<nav class="sidebar-nav">
+<div class="nav-item active" data-tab="dashboard"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</div>
+<div class="nav-item" data-tab="devices"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>Devices</div>
+<div class="nav-item" data-tab="bulk"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>Bulk Imaging</div>
+<div class="nav-item" data-tab="naming"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Naming Rules</div>
+<div class="nav-item" data-tab="scripts"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>Script Library</div>
+<div class="nav-item" data-tab="knowledge"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>Knowledge</div>
+<div class="nav-item" data-tab="tools"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>Quick Tools</div>
+<div class="nav-item" data-tab="exports"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Exports</div>
+</nav>
+<div class="sidebar-footer">
+<button class="btn btn-secondary btn-full btn-sm" onclick="logout()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Logout</button>
+</div>
+</div>
+
+<div id="main">
+<div id="topbar">
+<div class="topbar-title" id="topbar-title">Dashboard</div>
+<div><button class="btn btn-secondary btn-sm" id="mobile-menu-btn" onclick="toggleSidebar()" style="display:none">☰</button></div>
+</div>
+<div id="content">
+
+<!-- DASHBOARD -->
+<div class="tab-panel active" id="tab-dashboard">
+<div class="grid-4" id="dash-stats" style="margin-bottom:16px"></div>
+<div class="grid-2">
+<div class="card"><div class="card-title">Recent Devices</div><div id="dash-recent"></div></div>
+<div class="card"><div class="card-title">Department Breakdown</div><div id="dash-depts"></div></div>
+</div>
+</div>
+
+<!-- DEVICES -->
+<div class="tab-panel" id="tab-devices">
+<div class="section-header">
+<div class="section-title">Device Registry</div>
+<button class="btn btn-primary btn-sm" onclick="openDeviceModal()">+ Add Device</button>
+</div>
+<div class="search-bar">
+<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+<input type="text" id="dev-search" placeholder="Search name, asset tag, service tag, user, department, status…" oninput="renderDevices()">
+</div>
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+<select class="fsel" id="dev-f-dept" onchange="renderDevices()"><option value="">All Departments</option></select>
+<select class="fsel" id="dev-f-status" onchange="renderDevices()"><option value="">All Status</option><option>Active</option><option>Loaner</option><option>Retired</option></select>
+<select class="fsel" id="dev-f-type" onchange="renderDevices()"><option value="">All Types</option><option>Desktop</option><option>Laptop</option><option>Tablet</option></select>
+</div>
+<table>
+<thead><tr><th>Device Name</th><th>Asset Tag</th><th>Type</th><th>Department</th><th>Sub-Dept</th><th>User</th><th>Status</th><th>Checklist</th><th>Actions</th></tr></thead>
+<tbody id="dev-tbody"></tbody>
+</table>
+<div class="empty" id="dev-empty" style="display:none">No devices found. Add your first device above.</div>
+</div>
+
+<!-- BULK IMAGING -->
+<div class="tab-panel" id="tab-bulk">
+<div class="section-header">
+<div class="section-title">Bulk Imaging</div>
+<button class="btn btn-secondary btn-sm" onclick="clearBulk()">Clear Session</button>
+</div>
+<div class="card">
+<div class="card-title">Session Settings</div>
+<div class="form-row c4">
+<div class="field"><label>Department</label><select id="bulk-dept" onchange="bulkDeptChange()"><option value="">-- Select --</option></select></div>
+<div class="field"><label>Sub-Department</label><select id="bulk-sub" onchange="refreshBulkNames()" disabled><option value="">-- None --</option></select></div>
+<div class="field"><label>Device Type</label><select id="bulk-type" onchange="refreshBulkNames()"><option value="">-- Select --</option><option>Desktop</option><option>Laptop</option><option>Tablet</option></select></div>
+<div class="field"><label>Location</label><input type="text" id="bulk-loc" placeholder="Building / Room"></div>
+</div>
+<div class="form-row c2">
+<div class="field"><label>Imaging Tech</label><select id="bulk-tech"><option value="">-- Select --</option></select></div>
+</div>
+</div>
+<div class="bulk-grid" id="bulk-grid">
+<div class="bulk-row hdr"><span>Asset Tag</span><span>Service Tag</span><span>Assigned User</span><span>Generated Name</span><span></span></div>
+</div>
+<div style="margin-top:10px;color:var(--text3);font-size:12px;font-family:var(--mono)">↵ Enter on last field saves row and opens next</div>
+</div>
+
+<!-- NAMING RULES -->
+<div class="tab-panel" id="tab-naming">
+<div class="section-header">
+<div class="section-title">Naming Rules</div>
+<button class="btn btn-primary btn-sm" onclick="openNamingModal()">+ Add Department</button>
+</div>
+<div class="card">
+<div class="card-title">Template Variables</div>
+<div style="display:flex;gap:24px;flex-wrap:wrap;font-family:var(--mono);font-size:12px">
+<span style="color:var(--text3)">{PREFIX} → dept or sub-dept prefix</span>
+<span style="color:var(--text3)">{ASSET} → asset tag number</span>
+<span style="color:var(--text3)">{TYPE} → L / T / (blank for desktop)</span>
+<span style="color:var(--accent2)">{PREFIX}{ASSET}{TYPE} → AP00123L</span>
+</div>
+</div>
+<div id="naming-list"></div>
+</div>
+
+<!-- SCRIPTS -->
+<div class="tab-panel" id="tab-scripts">
+<div class="section-header">
+<div class="section-title">Script Library</div>
+<button class="btn btn-primary btn-sm" onclick="openScriptModal()">+ Add Script</button>
+</div>
+<div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+<div class="search-bar" style="flex:1;margin-bottom:0">
+<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+<input type="text" id="script-search" placeholder="Search scripts…" oninput="renderScripts()">
+</div>
+<select class="fsel" id="script-cat" onchange="renderScripts()">
+<option value="">All Categories</option><option>AD</option><option>GPO</option><option>Printer</option><option>Imaging</option><option>Network</option><option>Misc</option>
+</select>
+</div>
+<div id="scripts-list"></div>
+</div>
+
+<!-- KNOWLEDGE -->
+<div class="tab-panel" id="tab-knowledge">
+<div class="section-header">
+<div class="section-title">Knowledge Base</div>
+<button class="btn btn-primary btn-sm" onclick="openKbModal()">+ Add Article</button>
+</div>
+<div class="search-bar">
+<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+<input type="text" id="kb-search" placeholder="Search knowledge base…" oninput="renderKb()">
+</div>
+<div id="kb-list"></div>
+</div>
+
+<!-- QUICK TOOLS -->
+<div class="tab-panel" id="tab-tools">
+<div class="grid-2">
+<div>
+<div class="tool-box">
+<h3>🖥 Rename Script Generator</h3>
+<div class="field" style="margin-bottom:10px"><label>Device Name</label><input type="text" id="tool-rename" placeholder="DEPT00123L" oninput="updateRename()"></div>
+<div class="code-block" id="rename-out"></div>
+<button class="btn btn-secondary btn-sm" style="margin-top:8px" onclick="copyText(document.getElementById('rename-out').textContent)">Copy</button>
+</div>
+<div class="tool-box">
+<h3>🔗 Domain Join Script Generator</h3>
+<div class="form-row c2">
+<div class="field"><label>Domain Name</label><input type="text" id="tool-domain" value="county.local" oninput="updateDomain()"></div>
+<div class="field"><label>Department OU</label>
+<select id="tool-ou" onchange="updateDomain()" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:9px 30px 9px 12px;color:var(--text);outline:none;appearance:none;background-image:url('data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%2364748b\' stroke-width=\'2\'%3E%3Cpath d=\'M6 9l6 6 6-6\'/%3E%3C/svg%3E');background-repeat:no-repeat;background-position:right 10px center"><option value="">-- Select --</option></select>
+</div>
+</div>
+<div class="code-block" id="domain-out"></div>
+<button class="btn btn-secondary btn-sm" style="margin-top:8px" onclick="copyText(document.getElementById('domain-out').textContent)">Copy</button>
+</div>
+</div>
+<div>
+<div class="tool-box">
+<h3>🔍 Device Finder</h3>
+<div class="form-row c2">
+<div class="field"><label>Department</label>
+<select id="finder-dept" onchange="runFinder()" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:9px 30px 9px 12px;color:var(--text);outline:none;appearance:none;background-image:url('data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%2364748b\' stroke-width=\'2\'%3E%3Cpath d=\'M6 9l6 6 6-6\'/%3E%3C/svg%3E');background-repeat:no-repeat;background-position:right 10px center"><option value="">All</option></select>
+</div>
+<div class="field"><label>Status</label>
+<select id="finder-status" onchange="runFinder()" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:9px 30px 9px 12px;color:var(--text);outline:none;appearance:none;background-image:url('data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%2364748b\' stroke-width=\'2\'%3E%3Cpath d=\'M6 9l6 6 6-6\'/%3E%3C/svg%3E');background-repeat:no-repeat;background-position:right 10px center"><option value="">All</option><option>Active</option><option>Loaner</option><option>Retired</option></select>
+</div>
+<div class="field"><label>Device Type</label>
+<select id="finder-type" onchange="runFinder()" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:9px 30px 9px 12px;color:var(--text);outline:none;appearance:none;background-image:url('data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%2364748b\' stroke-width=\'2\'%3E%3Cpath d=\'M6 9l6 6 6-6\'/%3E%3C/svg%3E');background-repeat:no-repeat;background-position:right 10px center"><option value="">All</option><option>Desktop</option><option>Laptop</option><option>Tablet</option></select>
+</div>
+<div class="field"><label>Date From</label><input type="date" id="finder-from" class="date-inp" onchange="runFinder()"></div>
+<div class="field"><label>Date To</label><input type="date" id="finder-to" class="date-inp" onchange="runFinder()"></div>
+</div>
+<div id="finder-results"></div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- EXPORTS -->
+<div class="tab-panel" id="tab-exports">
+<div class="grid-2">
+<div class="tool-box">
+<h3>📤 Export Data</h3>
+<p style="color:var(--text2);font-size:13px;margin-bottom:16px;line-height:1.5">Export for backups or sharing between techs.</p>
+<div style="display:flex;flex-direction:column;gap:10px">
+<button class="btn btn-secondary" onclick="exportCSV()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Export Devices CSV</button>
+<button class="btn btn-secondary" onclick="exportJSON()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Export Full JSON Backup</button>
+</div>
+</div>
+<div class="tool-box">
+<h3>📥 Import Data</h3>
+<p style="color:var(--text2);font-size:13px;margin-bottom:16px;line-height:1.5">Import a JSON backup. Data is merged — no duplicates overwritten.</p>
+<label class="btn btn-secondary" style="cursor:pointer">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+Import JSON Backup
+<input type="file" accept=".json" style="display:none" onchange="importJSON(event)">
+</label>
+</div>
+<div class="tool-box">
+<h3>✅ Imaging Checklist Template</h3>
+<p style="color:var(--text2);font-size:13px;margin-bottom:12px;line-height:1.5">Global steps every device must complete. Appears on each device's Checklist tab.</p>
+<div id="cl-template-list"></div>
+<div style="display:flex;gap:8px;margin-top:10px">
+<input type="text" id="new-cl-step" placeholder="e.g. Domain join confirmed" style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:8px 12px;color:var(--text);outline:none" onkeydown="if(event.key==='Enter')addClStep()">
+<button class="btn btn-primary btn-sm" onclick="addClStep()">Add Step</button>
+</div>
+</div>
+<div class="tool-box">
+<h3>👥 Manage Techs</h3>
+<div id="techs-list" style="margin-bottom:12px"></div>
+<div style="display:flex;gap:8px">
+<input type="text" id="new-tech" placeholder="Tech name" style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:8px 12px;color:var(--text);outline:none" onkeydown="if(event.key==='Enter')addTech()">
+<button class="btn btn-primary btn-sm" onclick="addTech()">Add</button>
+</div>
+</div>
+<div class="tool-box" style="grid-column:1/-1;border-color:rgba(239,68,68,0.2)">
+<h3 style="color:var(--red)">⚠ Danger Zone</h3>
+<p style="color:var(--text2);font-size:13px;margin-bottom:16px">Permanently deletes all data stored in this browser. Cannot be undone.</p>
+<button class="btn btn-danger" onclick="clearAll()">Clear All Data</button>
+</div>
+</div>
+</div>
+
+</div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /app -->
+
+<!-- Drawer -->
+<div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+<div class="drawer-header">
+<h3 id="drawer-title">Device</h3>
+<button class="btn btn-secondary btn-xs" onclick="closeDrawer()">✕ Close</button>
+</div>
+<div class="drawer-tabs" id="drawer-tabs"></div>
+<div class="drawer-body" id="drawer-body"></div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modal-overlay">
+<div class="modal">
+<div class="modal-title" id="modal-title"></div>
+<div id="modal-body"></div>
+<div class="modal-actions" id="modal-actions"></div>
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const S={
+get(k){try{return JSON.parse(localStorage.getItem(k))||[]}catch{return[]}},
+set(k,v){localStorage.setItem(k,JSON.stringify(v))},
+getStr(k){return localStorage.getItem(k)||''},
+setStr(k,v){localStorage.setItem(k,v)}
+};
+
+let devices=S.get('devices'),
+    departments=S.get('departments'),
+    scripts=S.get('scripts'),
+    knowledge=S.get('knowledge'),
+    techs=S.get('techs'),
+    clTemplate=S.get('clTemplate');
+
+let bulkRows=[],
+    editDevId=null,
+    editScriptId=null,
+    editKbId=null,
+    editNamingId=null,
+    drawerDevId=null,
+    drawerTab='info';
+
+function save(){
+  S.set('devices',devices);S.set('departments',departments);
+  S.set('scripts',scripts);S.set('knowledge',knowledge);
+  S.set('techs',techs);S.set('clTemplate',clTemplate);
+}
+
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function toast(msg,type='ok'){const t=document.getElementById('toast');t.textContent=msg;t.className='toast '+type+' show';clearTimeout(t._t);t._t=setTimeout(()=>t.className='toast',3000)}
+function copyText(txt){navigator.clipboard.writeText(txt).then(()=>toast('Copied to clipboard'))}
+function download(name,mime,data){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([data],{type:mime}));a.download=name;a.click()}
+
+function doLogin(){
+  if(document.getElementById('login-pass').value==='1212'){
+    S.setStr('authVerified','true');
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('app').classList.add('visible');
+    init();
+  }else document.getElementById('login-err').textContent='Incorrect password.';
+}
+function logout(){S.setStr('authVerified','');location.reload()}
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open')}
+
+function navigate(tab){
+  document.querySelectorAll('.nav-item').forEach(el=>el.classList.toggle('active',el.dataset.tab===tab));
+  document.querySelectorAll('.tab-panel').forEach(el=>el.classList.toggle('active',el.id==='tab-'+tab));
+  const titles={dashboard:'Dashboard',devices:'Device Registry',bulk:'Bulk Imaging',naming:'Naming Rules',scripts:'Script Library',knowledge:'Knowledge Base',tools:'Quick Tools',exports:'Exports & Settings'};
+  document.getElementById('topbar-title').textContent=titles[tab]||tab;
+  ({dashboard:renderDashboard,devices:renderDevices,scripts:renderScripts,knowledge:renderKb,naming:renderNaming,bulk:renderBulk,tools:renderTools,exports:renderExports}[tab]||(() => {}))();
+}
+document.querySelectorAll('.nav-item').forEach(el=>el.addEventListener('click',()=>navigate(el.dataset.tab)));
+
+function openModal(title,body,actions){
+  document.getElementById('modal-title').textContent=title;
+  document.getElementById('modal-body').innerHTML=body;
+  document.getElementById('modal-actions').innerHTML=actions;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function closeModal(){document.getElementById('modal-overlay').classList.remove('open')}
+document.getElementById('modal-overlay').addEventListener('click',e=>{if(e.target===document.getElementById('modal-overlay'))closeModal()});
+
+function openDrawer(id){drawerDevId=id;drawerTab='info';renderDrawer();document.getElementById('drawer-overlay').classList.add('open');document.getElementById('drawer').classList.add('open')}
+function closeDrawer(){document.getElementById('drawer-overlay').classList.remove('open');document.getElementById('drawer').classList.remove('open');drawerDevId=null}
+function switchDTab(t){drawerTab=t;renderDrawer()}
+
+function renderDrawer(){
+  const d=devices.find(x=>x.id===drawerDevId);
+  if(!d)return;
+  document.getElementById('drawer-title').textContent=d.deviceName||'Device';
+  const tabs=[{id:'info',label:'Details'},{id:'checklist',label:'Checklist'},{id:'notes',label:'Notes'},{id:'scripts',label:'Scripts'}];
+  document.getElementById('drawer-tabs').innerHTML=tabs.map(t=>`<div class="dtab${drawerTab===t.id?' active':''}" onclick="switchDTab('${t.id}')">${t.label}</div>`).join('');
+  if(drawerTab==='info')renderDInfo(d);
+  else if(drawerTab==='checklist')renderDChecklist(d);
+  else if(drawerTab==='notes')renderDNotes(d);
+  else if(drawerTab==='scripts')renderDScripts(d);
+}
+
+function sb(s){return s==='Active'?'bg':s==='Loaner'?'by':'br'}
+
+function renderDInfo(d){
+  const dt=new Date(d.imagingDate).toLocaleString();
+  const rename=`Rename-Computer -NewName "${d.deviceName}" -Restart`;
+  const ticket=`Device Name: ${d.deviceName}\nAsset Tag: ${d.assetTag}\nService Tag: ${d.serviceTag||'N/A'}\nDepartment: ${d.department}${d.subdepartment?' / '+d.subdepartment:''}\nAssigned User: ${d.assignedUser||'N/A'}\nLocation: ${d.location||'N/A'}\nStatus: ${d.status}\nImaging Tech: ${d.imagingTech||'N/A'}\nImaging Date: ${dt}\nBitLocker: ${d.bitlocker?'Confirmed':'Not Confirmed'}\nWindows: ${d.windowsVersion||'N/A'}`;
+  document.getElementById('drawer-body').innerHTML=`
+<div class="d-actions">
+<button class="btn btn-secondary btn-sm" onclick="copyText(${JSON.stringify(d.deviceName)})">Copy Name</button>
+<button class="btn btn-secondary btn-sm" onclick="copyText(${JSON.stringify(ticket)})">Copy Ticket</button>
+<button class="btn btn-secondary btn-sm" onclick="copyText(${JSON.stringify(rename)})">Copy Rename Script</button>
+<button class="btn btn-primary btn-sm" onclick="closeDrawer();openDeviceModal('${d.id}')">Edit Device</button>
+</div>
+${[['Device Name',`<span class="mono" style="color:var(--accent2);font-size:15px;font-weight:700">${esc(d.deviceName)}</span>`],
+['Asset Tag',`<span class="mono">${esc(d.assetTag)}</span>`],
+['Service Tag',`<span class="mono">${esc(d.serviceTag)||'—'}</span>`],
+['Department',esc(d.department)],
+['Sub-Department',esc(d.subdepartment)||'—'],
+['Device Type',esc(d.deviceType)],
+['Assigned User',esc(d.assignedUser)||'—'],
+['Location',esc(d.location)||'—'],
+['Status',`<span class="badge ${sb(d.status)}">${esc(d.status)}</span>`],
+['Windows Version',esc(d.windowsVersion)||'—'],
+['BitLocker',d.bitlocker?'<span style="color:var(--green)">✓ Confirmed</span>':'<span style="color:var(--text3)">Not Confirmed</span>'],
+['Imaging Tech',esc(d.imagingTech)||'—'],
+['Imaging Date',dt]
+].map(([l,v])=>`<div class="detail-row"><span class="dl">${l}</span><span class="dv">${v}</span></div>`).join('')}`;
+}
+
+function renderDChecklist(d){
+  const steps=clTemplate||[];
+  const state=d.checklistState||{};
+  if(!steps.length){
+    document.getElementById('drawer-body').innerHTML=`<div style="padding:20px 0;color:var(--text3);font-size:13px;line-height:1.7">No checklist steps defined yet.<br>Go to <strong style="color:var(--text2)">Exports → Imaging Checklist Template</strong> to add steps.</div>`;
+    return;
+  }
+  const done=steps.filter(s=>state[s.id]?.checked).length;
+  const pct=Math.round((done/steps.length)*100);
+  document.getElementById('drawer-body').innerHTML=`
+<div style="margin-bottom:16px">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+<span style="font-size:13px;color:var(--text2);font-weight:500">Completion</span>
+<span class="badge ${pct===100?'bg':'bb'}">${done}/${steps.length} — ${pct}%</span>
+</div>
+<div class="prog-wrap"><div class="prog-bar" style="width:${pct}%"></div></div>
+</div>
+<div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius2);overflow:hidden">
+${steps.map(step=>{
+  const s=state[step.id]||{};
+  return`<div class="cl-item">
+<input type="checkbox" class="cl-cb" ${s.checked?'checked':''} onchange="toggleClStep('${d.id}','${step.id}',this.checked)">
+<div>
+<div class="cl-label${s.checked?' done':''}">${esc(step.label)}</div>
+${s.checked?`<div class="cl-who">${esc(s.tech||'—')} · ${new Date(s.ts).toLocaleString()}</div>`:''}
+</div>
+</div>`;}).join('')}
+</div>`;
+}
+
+function toggleClStep(devId,stepId,checked){
+  const d=devices.find(x=>x.id===devId);if(!d)return;
+  if(!d.checklistState)d.checklistState={};
+  d.checklistState[stepId]={checked,tech:techs[0]?.name||'Unknown',ts:Date.now()};
+  save();renderDrawer();renderDevices();
+}
+
+function renderDNotes(d){
+  const notes=d.noteTimeline||[];
+  document.getElementById('drawer-body').innerHTML=`
+<div style="margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border)">
+<div style="font-size:13px;font-weight:600;margin-bottom:10px">Add Note</div>
+<div class="field" style="margin-bottom:8px"><label>Tech</label><select id="note-tech">${techOpts(techs[0]?.name||'')}</select></div>
+<div class="field" style="margin-bottom:8px"><label>Note</label><textarea id="note-body" placeholder="What happened with this device?" style="min-height:72px"></textarea></div>
+<button class="btn btn-primary btn-sm" onclick="addNote('${d.id}')">Add Note</button>
+</div>
+<div style="font-size:13px;font-weight:500;color:var(--text2);margin-bottom:14px">${notes.length} Note${notes.length!==1?'s':''}</div>
+${notes.length?`<div class="timeline">${[...notes].reverse().map(n=>`
+<div class="tl-item">
+<div class="tl-meta">${esc(n.tech||'Unknown')} · ${new Date(n.ts).toLocaleString()}</div>
+<div class="tl-body">${esc(n.body)}</div>
+</div>`).join('')}</div>`:`<div style="color:var(--text3);font-size:13px">No notes yet. Add the first one above.</div>`}`;
+}
+
+function addNote(devId){
+  const body=document.getElementById('note-body')?.value.trim();
+  const tech=document.getElementById('note-tech')?.value||'Unknown';
+  if(!body){toast('Note cannot be empty','err');return}
+  const d=devices.find(x=>x.id===devId);if(!d)return;
+  if(!d.noteTimeline)d.noteTimeline=[];
+  d.noteTimeline.push({id:uid(),tech,body,ts:Date.now()});
+  save();renderDrawer();toast('Note added');
+}
+
+function renderDScripts(d){
+  const domain='county.local';
+  const ou=d.subdepartment||d.department;
+  const dc=domain.split('.').map(p=>`DC=${p}`).join(',');
+  const rename=`Rename-Computer -NewName "${d.deviceName}" -Restart`;
+  const join=`Add-Computer -DomainName "${domain}" -OUPath "OU=${ou},OU=Departments,${dc}"`;
+  document.getElementById('drawer-body').innerHTML=`
+<div style="margin-bottom:20px">
+<div style="font-size:11px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">Rename Computer</div>
+<div class="code-block">${esc(rename)}</div>
+<button class="btn btn-secondary btn-sm" style="margin-top:8px" onclick="copyText(${JSON.stringify(rename)})">Copy</button>
+</div>
+<div>
+<div style="font-size:11px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">Domain Join</div>
+<div class="code-block">${esc(join)}</div>
+<button class="btn btn-secondary btn-sm" style="margin-top:8px" onclick="copyText(${JSON.stringify(join)})">Copy</button>
+</div>`;
+}
+
+function typeCode(t){return t==='Laptop'?'L':t==='Tablet'?'T':''}
+
+function getPrefix(deptName,subId){
+  const dept=departments.find(x=>x.name===deptName);
+  if(!dept)return'';
+  if(subId){const sub=(dept.subdepts||[]).find(x=>x.id===subId);if(sub?.prefix)return sub.prefix}
+  return dept.prefix||'';
+}
+
+function genName(deptName,subId,asset,devType,override){
+  if(override)return override;
+  const dept=departments.find(x=>x.name===deptName);
+  if(!dept||!asset)return'';
+  return dept.template.replace('{PREFIX}',getPrefix(deptName,subId)).replace('{ASSET}',asset).replace('{TYPE}',typeCode(devType));
+}
+
+function techOpts(sel=''){
+  return`<option value="">-- Tech --</option>`+techs.map(t=>`<option value="${esc(t.name)}"${t.name===sel?' selected':''}>${esc(t.name)}</option>`).join('');
+}
+
+function subOpts(deptName,sel=''){
+  const dept=departments.find(x=>x.name===deptName);
+  return`<option value="">-- None (dept prefix) --</option>`+(dept?.subdepts||[]).map(s=>`<option value="${esc(s.id)}"${s.id===sel?' selected':''}>${esc(s.name)} [${esc(s.prefix)}]</option>`).join('');
+}
+
+function renderDashboard(){
+  const a=devices.filter(d=>d.status==='Active').length,
+        l=devices.filter(d=>d.status==='Loaner').length,
+        r=devices.filter(d=>d.status==='Retired').length;
+  document.getElementById('dash-stats').innerHTML=`
+<div class="stat-card blue"><div class="stat-label">Total Devices</div><div class="stat-val" style="color:var(--accent2)">${devices.length}</div><div class="stat-sub">${departments.length} departments</div></div>
+<div class="stat-card green"><div class="stat-label">Active</div><div class="stat-val" style="color:var(--green)">${a}</div><div class="stat-sub">deployed</div></div>
+<div class="stat-card yellow"><div class="stat-label">Loaners</div><div class="stat-val" style="color:var(--yellow)">${l}</div><div class="stat-sub">in circulation</div></div>
+<div class="stat-card purple"><div class="stat-label">Scripts</div><div class="stat-val" style="color:var(--purple)">${scripts.length}</div><div class="stat-sub">${knowledge.length} articles</div></div>`;
+  const rec=[...devices].sort((a,b)=>b.imagingDate-a.imagingDate).slice(0,6);
+  document.getElementById('dash-recent').innerHTML=rec.length
+    ?`<table><thead><tr><th>Name</th><th>Department</th><th>Tech</th></tr></thead><tbody>${rec.map(d=>`<tr onclick="openDrawer('${d.id}')"><td class="mono" style="color:var(--accent2)">${esc(d.deviceName)}</td><td>${esc(d.department)}${d.subdepartment?` / <span style="color:var(--text3)">${esc(d.subdepartment)}</span>`:''}</td><td>${esc(d.imagingTech)||'—'}</td></tr>`).join('')}</tbody></table>`
+    :'<div style="color:var(--text3);font-size:13px">No devices yet.</div>';
+  const dc={};
+  devices.forEach(d=>{const k=d.department+(d.subdepartment?' › '+d.subdepartment:'');dc[k]=(dc[k]||0)+1});
+  document.getElementById('dash-depts').innerHTML=Object.entries(dc).slice(0,8).map(([k,v])=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(37,45,61,0.5)"><span style="font-size:13px">${esc(k)}</span><span class="badge bb">${v}</span></div>`).join('')
+    +`<div style="color:var(--text3);font-size:12px;font-family:var(--mono);margin-top:10px">${r} retired device${r!==1?'s':''}</div>`;
+}
+
+function renderDevices(){
+  const q=(document.getElementById('dev-search').value||'').toLowerCase();
+  const fd=document.getElementById('dev-f-dept').value;
+  const fs=document.getElementById('dev-f-status').value;
+  const ft=document.getElementById('dev-f-type').value;
+  const ds=document.getElementById('dev-f-dept');
+  const pv=ds.value;
+  ds.innerHTML=`<option value="">All Departments</option>`+departments.map(d=>`<option${d.name===pv?' selected':''}>${esc(d.name)}</option>`).join('');
+  ds.value=pv;
+  const filtered=devices.filter(d=>{
+    if(fd&&d.department!==fd)return false;
+    if(fs&&d.status!==fs)return false;
+    if(ft&&d.deviceType!==ft)return false;
+    if(q&&![d.deviceName,d.assetTag,d.serviceTag,d.assignedUser,d.department,d.subdepartment,d.status].join(' ').toLowerCase().includes(q))return false;
+    return true;
+  }).sort((a,b)=>b.imagingDate-a.imagingDate);
+  const tb=document.getElementById('dev-tbody');
+  const em=document.getElementById('dev-empty');
+  if(!filtered.length){tb.innerHTML='';em.style.display='';return}
+  em.style.display='none';
+  const steps=clTemplate||[];
+  tb.innerHTML=filtered.map(d=>{
+    const state=d.checklistState||{};
+    const done=steps.filter(s=>state[s.id]?.checked).length;
+    const pct=steps.length?Math.round((done/steps.length)*100):null;
+    return`<tr onclick="openDrawer('${d.id}')">
+<td class="mono" style="color:var(--accent2)">${esc(d.deviceName)}</td>
+<td class="mono">${esc(d.assetTag)}</td>
+<td>${esc(d.deviceType)}</td>
+<td>${esc(d.department)}</td>
+<td style="color:var(--text3)">${esc(d.subdepartment)||'—'}</td>
+<td>${esc(d.assignedUser)||'—'}</td>
+<td><span class="badge ${sb(d.status)}">${esc(d.status)}</span></td>
+<td>${pct===null?'<span style="color:var(--text3);font-size:11px">—</span>':pct===100?'<span class="badge bg">✓ Done</span>':`<span class="badge bb">${pct}%</span>`}</td>
+<td onclick="event.stopPropagation()" style="white-space:nowrap">
+<button class="btn btn-secondary btn-xs" onclick="openDeviceModal('${d.id}')">Edit</button>
+<button class="btn btn-danger btn-xs" style="margin-left:4px" onclick="delDevice('${d.id}')">Del</button>
+</td></tr>`;}).join('');
+}
+
+function openDeviceModal(id){
+  editDevId=id||null;
+  const d=id?devices.find(x=>x.id===id):{};
+  const hasSubs=d.department&&(departments.find(x=>x.name===d.department)?.subdepts||[]).length>0;
+  openModal(id?'Edit Device':'Add Device',`
+<div class="form-row c2">
+<div class="field"><label>Department *</label>
+<select id="dm-dept" onchange="dmDeptChange()">
+<option value="">-- Select --</option>
+${departments.map(dep=>`<option value="${esc(dep.name)}"${dep.name===d.department?' selected':''}>${esc(dep.name)}</option>`).join('')}
+</select></div>
+<div class="field"><label>Sub-Department</label>
+<select id="dm-sub" onchange="dmUpdateName()" ${hasSubs?'':'disabled'}>${subOpts(d.department,d.subdeptId)}</select>
+</div>
+</div>
+<div class="form-row c2">
+<div class="field"><label>Device Type *</label>
+<select id="dm-type" onchange="dmUpdateName()">
+<option${(d.deviceType||'Desktop')==='Desktop'?' selected':''}>Desktop</option>
+<option${(d.deviceType||'')==='Laptop'?' selected':''}>Laptop</option>
+<option${(d.deviceType||'')==='Tablet'?' selected':''}>Tablet</option>
+</select></div>
+<div class="field"><label>Asset Tag (numbers only) *</label>
+<input type="text" id="dm-asset" value="${esc(d.assetTag||'')}" oninput="this.value=this.value.replace(/\\D/g,'');dmUpdateName()" placeholder="00123">
+</div>
+</div>
+<div class="form-row c2">
+<div class="field"><label>Device Name</label>
+<input type="text" id="dm-name" value="${esc(d.deviceName||'')}" placeholder="Auto-generated" ${d.nameOverride?'':'readonly'}>
+</div>
+<div class="field" style="justify-content:flex-end;padding-top:20px">
+<div class="toggle-wrap"><label class="toggle"><input type="checkbox" id="dm-override" ${d.nameOverride?'checked':''} onchange="document.getElementById('dm-name').readOnly=!this.checked;if(!this.checked)dmUpdateName()"><span class="toggle-slider"></span></label><span style="font-size:12px;color:var(--text2)">Override name</span></div>
+</div>
+</div>
+<div class="form-row c2">
+<div class="field"><label>Service Tag</label><input type="text" id="dm-service" value="${esc(d.serviceTag||'')}" placeholder="ABC1234"></div>
+<div class="field"><label>Assigned User</label><input type="text" id="dm-user" value="${esc(d.assignedUser||'')}" placeholder="John Smith"></div>
+</div>
+<div class="form-row c2">
+<div class="field"><label>Location</label><input type="text" id="dm-loc" value="${esc(d.location||'')}" placeholder="Building A, Room 101"></div>
+<div class="field"><label>Status</label>
+<select id="dm-status">
+<option${(d.status||'Active')==='Active'?' selected':''}>Active</option>
+<option${(d.status||'')==='Loaner'?' selected':''}>Loaner</option>
+<option${(d.status||'')==='Retired'?' selected':''}>Retired</option>
+</select></div>
+</div>
+<div class="form-row c2">
+<div class="field"><label>Windows Version</label><input type="text" id="dm-win" value="${esc(d.windowsVersion||'')}" placeholder="Windows 11 Pro 23H2"></div>
+<div class="field"><label>Imaging Tech</label><select id="dm-tech">${techOpts(d.imagingTech)}</select></div>
+</div>
+<div class="form-row">
+<div class="toggle-wrap"><label class="toggle"><input type="checkbox" id="dm-bl" ${d.bitlocker?'checked':''}><span class="toggle-slider"></span></label><span style="font-size:13px;color:var(--text2)">BitLocker Confirmed</span></div>
+</div>`,
+`<button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveDevice()">Save Device</button>`);
+  setTimeout(dmUpdateName,10);
+}
+
+function dmDeptChange(){
+  const dept=document.getElementById('dm-dept').value;
+  const sub=document.getElementById('dm-sub');
+  const subs=(departments.find(x=>x.name===dept)?.subdepts)||[];
+  sub.innerHTML=subOpts(dept);
+  sub.disabled=!subs.length;
+  dmUpdateName();
+}
+
+function dmUpdateName(){
+  if(document.getElementById('dm-override')?.checked)return;
+  const el=document.getElementById('dm-name');
+  if(el)el.value=genName(
+    document.getElementById('dm-dept')?.value,
+    document.getElementById('dm-sub')?.value,
+    document.getElementById('dm-asset')?.value,
+    document.getElementById('dm-type')?.value
+  )||'';
+}
+
+function saveDevice(){
+  const dept=document.getElementById('dm-dept').value;
+  const asset=document.getElementById('dm-asset').value;
+  const type=document.getElementById('dm-type').value;
+  if(!dept||!asset||!type){toast('Department, Asset Tag, and Type required.','err');return}
+  const subId=document.getElementById('dm-sub').value;
+  const subdept=(departments.find(x=>x.name===dept)?.subdepts||[]).find(x=>x.id===subId);
+  const override=document.getElementById('dm-override').checked;
+  const name=document.getElementById('dm-name').value;
+  const ex=editDevId?devices.find(x=>x.id===editDevId):{};
+  const obj={
+    id:editDevId||uid(),
+    department:dept,subdeptId:subId||'',subdepartment:subdept?.name||'',
+    assetTag:asset,deviceType:type,
+    serviceTag:document.getElementById('dm-service').value,
+    deviceName:name||genName(dept,subId,asset,type),
+    nameOverride:override,
+    assignedUser:document.getElementById('dm-user').value,
+    location:document.getElementById('dm-loc').value,
+    status:document.getElementById('dm-status').value,
+    windowsVersion:document.getElementById('dm-win').value,
+    imagingTech:document.getElementById('dm-tech').value,
+    bitlocker:document.getElementById('dm-bl').checked,
+    imagingDate:ex.imagingDate||Date.now(),
+    noteTimeline:ex.noteTimeline||[],
+    checklistState:ex.checklistState||{}
+  };
+  if(editDevId){const i=devices.findIndex(x=>x.id===editDevId);if(i>=0)devices[i]=obj;}
+  else devices.unshift(obj);
+  save();closeModal();renderDevices();toast(editDevId?'Device updated':'Device added');
+}
+
+function delDevice(id){
+  if(!confirm('Delete this device?'))return;
+  devices=devices.filter(x=>x.id!==id);
+  save();renderDevices();toast('Device deleted');
+}
+
+function renderNaming(){
+  const el=document.getElementById('naming-list');
+  if(!departments.length){el.innerHTML='<div class="empty">No departments yet. Add one above.</div>';return}
+  el.innerHTML=departments.map(d=>{
+    const subs=d.subdepts||[];
+    const prev=p=>d.template.replace('{PREFIX}',p).replace('{ASSET}','00123').replace('{TYPE}','L');
+    return`<div class="card" style="margin-bottom:10px">
+<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+<div>
+<div style="font-weight:700;font-size:15px;margin-bottom:5px">${esc(d.name)}</div>
+<div style="display:flex;gap:16px;flex-wrap:wrap;font-family:var(--mono);font-size:12px">
+<span>Prefix: <span style="color:var(--accent2)">${esc(d.prefix)}</span></span>
+<span>Template: <span style="color:var(--text2)">${esc(d.template)}</span></span>
+<span>Preview: <span style="color:var(--green)">${esc(prev(d.prefix))}</span></span>
+</div>
+</div>
+<div style="display:flex;gap:6px;flex-shrink:0">
+<button class="btn btn-secondary btn-xs" onclick="openNamingModal('${esc(d.id)}')">Edit</button>
+<button class="btn btn-danger btn-xs" onclick="delDept('${esc(d.id)}')">Del</button>
+</div>
+</div>
+${subs.length?`
+<div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">
+<div style="font-size:11px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">Sub-Departments</div>
+${subs.map(s=>`<div class="subdept-row">
+<span style="color:var(--text3);font-family:var(--mono);font-size:12px;width:16px;flex-shrink:0">↳</span>
+<span style="flex:1;font-size:13px;font-weight:500">${esc(s.name)}</span>
+<span style="font-family:var(--mono);font-size:12px;color:var(--accent2);margin-right:12px">Prefix: ${esc(s.prefix)}</span>
+<span style="font-family:var(--mono);font-size:12px;color:var(--green);margin-right:14px">→ ${esc(prev(s.prefix))}</span>
+<button class="btn btn-danger btn-xs" onclick="delSubdept('${esc(d.id)}','${esc(s.id)}')">Del</button>
+</div>`).join('')}
+</div>`:''}
+<div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(37,45,61,0.5);display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+<input type="text" id="sn-${esc(d.id)}" placeholder="Sub-dept name (e.g. Appraisers)" style="flex:1;min-width:160px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:7px 11px;color:var(--text);outline:none;font-size:13px" onkeydown="if(event.key==='Enter')addSubdept('${esc(d.id)}')">
+<input type="text" id="sp-${esc(d.id)}" placeholder="Prefix e.g. AP" maxlength="6" style="width:110px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:7px 11px;color:var(--accent2);outline:none;font-size:13px;font-family:var(--mono);font-weight:700;text-transform:uppercase" oninput="this.value=this.value.toUpperCase()">
+<button class="btn btn-green btn-xs" onclick="addSubdept('${esc(d.id)}')">+ Add Sub-Dept</button>
+</div>
+</div>`;}).join('');
+}
+
+function openNamingModal(id){
+  editNamingId=id||null;
+  const d=id?departments.find(x=>x.id===id):{};
+  openModal(id?'Edit Department':'Add Department',`
+<div class="form-row"><div class="field"><label>Department Full Name *</label><input type="text" id="nm-name" value="${esc(d.name||'')}" placeholder="Assessors" oninput="nmPreview()"></div></div>
+<div class="form-row c2">
+<div class="field"><label>Dept Prefix *</label><input type="text" id="nm-prefix" value="${esc(d.prefix||'')}" maxlength="6" placeholder="A" oninput="this.value=this.value.toUpperCase();nmPreview()"></div>
+<div class="field"><label>Template Format *</label><input type="text" id="nm-tmpl" value="${esc(d.template||'{PREFIX}{ASSET}{TYPE}')}" placeholder="{PREFIX}{ASSET}{TYPE}" oninput="nmPreview()"></div>
+</div>
+<div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-top:4px">
+<div style="font-size:11px;color:var(--text3);margin-bottom:6px;font-family:var(--mono);text-transform:uppercase;letter-spacing:0.08em">Live Preview — asset 00123, Laptop</div>
+<div id="nm-preview" style="font-family:var(--mono);font-size:20px;color:var(--accent2);font-weight:700"></div>
+</div>
+<div style="margin-top:12px;font-size:12px;color:var(--text3);line-height:1.6">Sub-departments are added from the Naming Rules list after saving this department.</div>`,
+`<button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveDept()">Save Department</button>`);
+  setTimeout(nmPreview,0);
+}
+
+function nmPreview(){
+  const p=(document.getElementById('nm-prefix')?.value||'').toUpperCase();
+  const t=document.getElementById('nm-tmpl')?.value||'';
+  const el=document.getElementById('nm-preview');
+  if(el)el.textContent=t.replace('{PREFIX}',p).replace('{ASSET}','00123').replace('{TYPE}','L')||'—';
+}
+
+function saveDept(){
+  const name=document.getElementById('nm-name').value.trim();
+  const prefix=document.getElementById('nm-prefix').value.trim().toUpperCase();
+  const template=document.getElementById('nm-tmpl').value.trim();
+  if(!name||!prefix||!template){toast('All fields required','err');return}
+  const ex=editNamingId?departments.find(x=>x.id===editNamingId):null;
+  const obj={id:editNamingId||uid(),name,prefix,template,subdepts:ex?.subdepts||[]};
+  if(editNamingId){const i=departments.findIndex(x=>x.id===editNamingId);if(i>=0)departments[i]=obj;}
+  else departments.push(obj);
+  save();closeModal();renderNaming();toast('Department saved');
+}
+
+function delDept(id){
+  if(!confirm('Delete department and all sub-departments?'))return;
+  departments=departments.filter(x=>x.id!==id);
+  save();renderNaming();toast('Deleted');
+}
+
+function addSubdept(deptId){
+  const nameEl=document.getElementById('sn-'+deptId);
+  const prefixEl=document.getElementById('sp-'+deptId);
+  const name=nameEl?.value.trim();
+  const prefix=prefixEl?.value.trim().toUpperCase();
+  if(!name||!prefix){toast('Name and prefix required','err');return}
+  const dept=departments.find(x=>x.id===deptId);if(!dept)return;
+  if(!dept.subdepts)dept.subdepts=[];
+  dept.subdepts.push({id:uid(),name,prefix});
+  save();renderNaming();toast(`Sub-dept "${name}" added`);
+}
+
+function delSubdept(deptId,subId){
+  const dept=departments.find(x=>x.id===deptId);if(!dept)return;
+  dept.subdepts=(dept.subdepts||[]).filter(x=>x.id!==subId);
+  save();renderNaming();toast('Sub-dept removed');
+}
+
+function renderBulk(){
+  const ds=document.getElementById('bulk-dept');
+  const pv=ds.value;
+  ds.innerHTML=`<option value="">-- Select --</option>`+departments.map(d=>`<option value="${esc(d.name)}"${d.name===pv?' selected':''}>${esc(d.name)}</option>`).join('');
+  ds.value=pv;
+  const ts=document.getElementById('bulk-tech');
+  const pt=ts.value;
+  ts.innerHTML=`<option value="">-- Select --</option>`+techs.map(t=>`<option${t.name===pt?' selected':''}>${esc(t.name)}</option>`).join('');
+  ts.value=pt;
+  if(pv)bulkDeptChange();
+  renderBulkRows();
+}
+
+function bulkDeptChange(){
+  const dept=document.getElementById('bulk-dept').value;
+  const sub=document.getElementById('bulk-sub');
+  const subs=(departments.find(x=>x.name===dept)?.subdepts)||[];
+  sub.innerHTML=`<option value="">-- None (dept prefix) --</option>`+subs.map(s=>`<option value="${esc(s.id)}">${esc(s.name)} [${esc(s.prefix)}]</option>`).join('');
+  sub.disabled=!subs.length;
+  refreshBulkNames();
+}
+
+function bulkName(asset){
+  return genName(
+    document.getElementById('bulk-dept')?.value,
+    document.getElementById('bulk-sub')?.value,
+    asset,
+    document.getElementById('bulk-type')?.value
+  );
+}
+
+function renderBulkRows(){
+  const grid=document.getElementById('bulk-grid');
+  grid.querySelectorAll('.bulk-row:not(.hdr)').forEach(r=>r.remove());
+  bulkRows.forEach((row,i)=>grid.appendChild(makeBulkRow(i,row)));
+  if(!bulkRows.length||bulkRows[bulkRows.length-1].locked)addBulkRow();
+}
+
+function makeBulkRow(i,row){
+  const div=document.createElement('div');
+  div.className='bulk-row'+(row.locked?' locked':'');
+  div.dataset.i=i;
+  const name=bulkName(row.asset||'');
+  div.innerHTML=`
+<input placeholder="Asset Tag" value="${esc(row.asset||'')}" data-f="asset" ${row.locked?'disabled':''} oninput="bInput(${i},this)" onkeydown="bKey(event,${i},'asset')">
+<input placeholder="Service Tag" value="${esc(row.st||'')}" data-f="st" ${row.locked?'disabled':''} oninput="bInput(${i},this)" onkeydown="bKey(event,${i},'st')">
+<input placeholder="Assigned User" value="${esc(row.user||'')}" data-f="user" ${row.locked?'disabled':''} oninput="bInput(${i},this)" onkeydown="bKey(event,${i},'user')">
+<div class="gname">${esc(name||'—')}</div>
+<div class="rsave">${row.locked?'<span style="color:var(--green);font-size:18px;padding:0 12px">✓</span>':`<button class="btn btn-green btn-xs" style="margin:0 8px" onclick="saveBulkRow(${i})">Save</button>`}</div>`;
+  return div;
+}
+
+function bInput(i,inp){
+  const f=inp.dataset.f;
+  if(f==='asset')inp.value=inp.value.replace(/\D/g,'');
+  bulkRows[i][f]=inp.value;
+  const nd=inp.closest('.bulk-row').querySelector('.gname');
+  if(nd)nd.textContent=bulkName(bulkRows[i].asset||'')||'—';
+}
+
+function bKey(e,i,f){
+  if(e.key==='Enter'){
+    if(f==='user')saveBulkRow(i);
+    else{
+      const nf={asset:'st',st:'user'}[f];
+      const row=document.querySelectorAll('#bulk-grid .bulk-row:not(.hdr)')[i];
+      if(row)row.querySelector(`input[data-f="${nf}"]`)?.focus();
+    }
+  }
+}
+
+function saveBulkRow(i){
+  const row=bulkRows[i];
+  const dept=document.getElementById('bulk-dept').value;
+  const subId=document.getElementById('bulk-sub').value;
+  const type=document.getElementById('bulk-type').value;
+  const tech=document.getElementById('bulk-tech').value;
+  const loc=document.getElementById('bulk-loc').value;
+  if(!dept||!type){toast('Set department and device type first','err');return}
+  if(!row.asset){toast('Asset tag required','err');return}
+  const subdept=(departments.find(x=>x.name===dept)?.subdepts||[]).find(x=>x.id===subId);
+  const name=bulkName(row.asset);
+  devices.unshift({
+    id:uid(),department:dept,subdeptId:subId||'',subdepartment:subdept?.name||'',
+    assetTag:row.asset,deviceType:type,serviceTag:row.st||'',deviceName:name,
+    assignedUser:row.user||'',location:loc,status:'Active',imagingTech:tech,
+    imagingDate:Date.now(),bitlocker:false,noteTimeline:[],checklistState:{}
+  });
+  save();
+  bulkRows[i].locked=true;
+  renderBulkRows();
+  toast(`Saved: ${name}`);
+}
+
+function addBulkRow(){
+  bulkRows.push({asset:'',st:'',user:'',locked:false});
+  const grid=document.getElementById('bulk-grid');
+  const row=makeBulkRow(bulkRows.length-1,bulkRows[bulkRows.length-1]);
+  grid.appendChild(row);
+  setTimeout(()=>row.querySelector('input')?.focus(),50);
+}
+
+function refreshBulkNames(){
+  document.querySelectorAll('#bulk-grid .bulk-row:not(.hdr)').forEach(r=>{
+    const i=parseInt(r.dataset.i);
+    const nd=r.querySelector('.gname');
+    if(nd&&!bulkRows[i]?.locked)nd.textContent=bulkName(bulkRows[i]?.asset||'')||'—';
+  });
+}
+
+function clearBulk(){
+  if(!confirm('Clear session? Saved devices are kept.'))return;
+  bulkRows=[];renderBulkRows();
+}
+
+function renderScripts(){
+  const q=(document.getElementById('script-search').value||'').toLowerCase();
+  const cat=document.getElementById('script-cat').value;
+  const list=[...scripts].filter(s=>{
+    if(cat&&s.category!==cat)return false;
+    if(q&&![s.title,s.description,s.body,...(s.tags||[])].join(' ').toLowerCase().includes(q))return false;
+    return true;
+  }).sort((a,b)=>(b.pinned||0)-(a.pinned||0));
+  const el=document.getElementById('scripts-list');
+  if(!list.length){el.innerHTML='<div class="empty">No scripts found.</div>';return}
+  const cc={AD:'bb',GPO:'bp',Printer:'by',Imaging:'bg',Network:'bc',Misc:'br'};
+  el.innerHTML=list.map(s=>`<div class="script-card${s.pinned?' pinned':''}">
+<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:8px">
+<div style="font-weight:600;font-size:14px">${esc(s.title)} ${s.pinned?'<span style="color:var(--yellow);font-size:11px;font-family:var(--mono)">★ Pinned</span>':''}</div>
+<div style="display:flex;gap:6px;flex-shrink:0">
+<button class="btn btn-secondary btn-xs" onclick="togglePin('${s.id}')">${s.pinned?'Unpin':'Pin'}</button>
+<button class="btn btn-secondary btn-xs" onclick="openScriptModal('${s.id}')">Edit</button>
+<button class="btn btn-danger btn-xs" onclick="delScript('${s.id}')">Del</button>
+</div>
+</div>
+<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+<span class="badge ${cc[s.category]||'bb'}">${esc(s.category)}</span>
+<span class="badge bp">${esc(s.language)}</span>
+${(s.tags||[]).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}
+</div>
+${s.description?`<div style="font-size:13px;color:var(--text2);margin-bottom:10px;line-height:1.5">${esc(s.description)}</div>`:''}
+<div class="code-block" style="max-height:120px;overflow:auto">${esc(s.body)}</div>
+<div style="margin-top:8px"><button class="btn btn-secondary btn-sm" onclick="copyText(${JSON.stringify(s.body)})">Copy Script</button></div>
+</div>`).join('');
+}
+
+function openScriptModal(id){
+  editScriptId=id||null;
+  const s=id?scripts.find(x=>x.id===id):{};
+  window._stags=id?[...(s.tags||[])]:[];
+  openModal(id?'Edit Script':'Add Script',`
+<div class="form-row"><div class="field"><label>Title *</label><input type="text" id="sm-title" value="${esc(s.title||'')}" placeholder="Script title"></div></div>
+<div class="form-row c2">
+<div class="field"><label>Category</label><select id="sm-cat">${['AD','GPO','Printer','Imaging','Network','Misc'].map(c=>`<option${(s.category||'Misc')===c?' selected':''}>${c}</option>`).join('')}</select></div>
+<div class="field"><label>Language</label><select id="sm-lang">${['PowerShell','CMD','Other'].map(l=>`<option${(s.language||'PowerShell')===l?' selected':''}>${l}</option>`).join('')}</select></div>
+</div>
+<div class="form-row"><div class="field"><label>Description</label><input type="text" id="sm-desc" value="${esc(s.description||'')}" placeholder="Brief description"></div></div>
+<div class="form-row"><div class="field"><label>Script Body *</label><textarea id="sm-body" style="min-height:150px;font-family:var(--mono);font-size:12px">${esc(s.body||'')}</textarea></div></div>
+<div class="field"><label>Tags (press Enter to add)</label>
+<div class="tags-wrap" onclick="document.getElementById('stag-inp').focus()">
+<span id="stag-disp">${window._stags.map(t=>`<span class="tag">${esc(t)}<span class="tag-x" onclick="rmStag('${esc(t)}')">×</span></span>`).join('')}</span>
+<input type="text" id="stag-inp" placeholder="Add tag…" onkeydown="if(event.key==='Enter'){event.preventDefault();addStag()}">
+</div></div>`,
+`<button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveScript()">Save Script</button>`);
+}
+
+function addStag(){const v=document.getElementById('stag-inp').value.trim();if(!v)return;if(!window._stags.includes(v)){window._stags.push(v);document.getElementById('stag-disp').innerHTML=window._stags.map(t=>`<span class="tag">${esc(t)}<span class="tag-x" onclick="rmStag('${esc(t)}')">×</span></span>`).join('')}document.getElementById('stag-inp').value=''}
+function rmStag(t){window._stags=window._stags.filter(x=>x!==t);document.getElementById('stag-disp').innerHTML=window._stags.map(t=>`<span class="tag">${esc(t)}<span class="tag-x" onclick="rmStag('${esc(t)}')">×</span></span>`).join('')}
+
+function saveScript(){
+  const title=document.getElementById('sm-title').value.trim();
+  const body=document.getElementById('sm-body').value.trim();
+  if(!title||!body){toast('Title and body required','err');return}
+  const ex=editScriptId?scripts.find(x=>x.id===editScriptId):null;
+  const obj={id:editScriptId||uid(),title,category:document.getElementById('sm-cat').value,language:document.getElementById('sm-lang').value,description:document.getElementById('sm-desc').value,body,tags:window._stags||[],pinned:ex?.pinned||false};
+  if(editScriptId){const i=scripts.findIndex(x=>x.id===editScriptId);if(i>=0)scripts[i]=obj;}else scripts.unshift(obj);
+  save();closeModal();renderScripts();toast('Script saved');
+}
+function delScript(id){if(!confirm('Delete?'))return;scripts=scripts.filter(x=>x.id!==id);save();renderScripts();toast('Deleted')}
+function togglePin(id){const s=scripts.find(x=>x.id===id);if(s)s.pinned=!s.pinned;save();renderScripts()}
+
+function renderKb(){
+  const q=(document.getElementById('kb-search').value||'').toLowerCase();
+  const list=[...knowledge].filter(k=>!q||[k.title,k.body,...(k.tags||[])].join(' ').toLowerCase().includes(q)).sort((a,b)=>b.dateAdded-a.dateAdded);
+  const el=document.getElementById('kb-list');
+  if(!list.length){el.innerHTML='<div class="empty">No articles found.</div>';return}
+  const hl=str=>q?esc(str).replace(new RegExp(esc(q).replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi'),m=>`<span class="hl">${m}</span>`):esc(str);
+  el.innerHTML=list.map(k=>`<div class="kb-card" onclick="this.querySelector('.kb-body').classList.toggle('expanded')">
+<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+<div style="flex:1">
+<div style="font-weight:600;font-size:14px;margin-bottom:4px">${hl(k.title)}</div>
+<div style="font-size:11px;color:var(--text3);font-family:var(--mono);margin-bottom:6px">${new Date(k.dateAdded).toLocaleDateString()}</div>
+<div class="kb-body">${hl(k.body)}</div>
+${(k.tags||[]).length?`<div style="margin-top:8px">${(k.tags||[]).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div>`:''}
+</div>
+<div style="display:flex;gap:6px;flex-shrink:0">
+<button class="btn btn-secondary btn-xs" onclick="event.stopPropagation();openKbModal('${k.id}')">Edit</button>
+<button class="btn btn-danger btn-xs" onclick="event.stopPropagation();delKb('${k.id}')">Del</button>
+</div>
+</div></div>`).join('');
+}
+
+function openKbModal(id){
+  editKbId=id||null;
+  const k=id?knowledge.find(x=>x.id===id):{};
+  window._ktags=id?[...(k.tags||[])]:[];
+  openModal(id?'Edit Article':'Add Article',`
+<div class="form-row"><div class="field"><label>Title *</label><input type="text" id="km-title" value="${esc(k.title||'')}" placeholder="Article title"></div></div>
+<div class="form-row"><div class="field"><label>Body *</label><textarea id="km-body" style="min-height:180px">${esc(k.body||'')}</textarea></div></div>
+<div class="field"><label>Tags (press Enter)</label>
+<div class="tags-wrap" onclick="document.getElementById('ktag-inp').focus()">
+<span id="ktag-disp">${window._ktags.map(t=>`<span class="tag">${esc(t)}<span class="tag-x" onclick="rmKtag('${esc(t)}')">×</span></span>`).join('')}</span>
+<input type="text" id="ktag-inp" placeholder="Add tag…" onkeydown="if(event.key==='Enter'){event.preventDefault();addKtag()}">
+</div></div>`,
+`<button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveKb()">Save Article</button>`);
+}
+
+function addKtag(){const v=document.getElementById('ktag-inp').value.trim();if(!v)return;if(!window._ktags.includes(v)){window._ktags.push(v);document.getElementById('ktag-disp').innerHTML=window._ktags.map(t=>`<span class="tag">${esc(t)}<span class="tag-x" onclick="rmKtag('${esc(t)}')">×</span></span>`).join('')}document.getElementById('ktag-inp').value=''}
+function rmKtag(t){window._ktags=window._ktags.filter(x=>x!==t);document.getElementById('ktag-disp').innerHTML=window._ktags.map(t=>`<span class="tag">${esc(t)}<span class="tag-x" onclick="rmKtag('${esc(t)}')">×</span></span>`).join('')}
+
+function saveKb(){
+  const title=document.getElementById('km-title').value.trim();
+  const body=document.getElementById('km-body').value.trim();
+  if(!title||!body){toast('Title and body required','err');return}
+  const ex=editKbId?knowledge.find(x=>x.id===editKbId):null;
+  const obj={id:editKbId||uid(),title,body,tags:window._ktags||[],dateAdded:ex?.dateAdded||Date.now()};
+  if(editKbId){const i=knowledge.findIndex(x=>x.id===editKbId);if(i>=0)knowledge[i]=obj;}else knowledge.unshift(obj);
+  save();closeModal();renderKb();toast('Article saved');
+}
+function delKb(id){if(!confirm('Delete?'))return;knowledge=knowledge.filter(x=>x.id!==id);save();renderKb();toast('Deleted')}
+
+function renderTools(){
+  document.getElementById('tool-ou').innerHTML=`<option value="">-- Select --</option>`+departments.map(d=>`<option value="${esc(d.name)}">${esc(d.name)}</option>`).join('');
+  document.getElementById('finder-dept').innerHTML=`<option value="">All</option>`+departments.map(d=>`<option value="${esc(d.name)}">${esc(d.name)}</option>`).join('');
+  updateRename();updateDomain();runFinder();
+}
+
+function updateRename(){
+  const n=document.getElementById('tool-rename').value||'DEVICE_NAME';
+  document.getElementById('rename-out').textContent=`Rename-Computer -NewName "${n}" -Restart`;
+}
+
+function updateDomain(){
+  const domain=document.getElementById('tool-domain').value||'county.local';
+  const dept=document.getElementById('tool-ou').value||'DEPARTMENT';
+  const dc=domain.split('.').map(p=>`DC=${p}`).join(',');
+  document.getElementById('domain-out').textContent=`Add-Computer -DomainName "${domain}" -OUPath "OU=${dept},OU=Departments,${dc}"`;
+}
+
+function runFinder(){
+  const dept=document.getElementById('finder-dept')?.value;
+  const status=document.getElementById('finder-status')?.value;
+  const type=document.getElementById('finder-type')?.value;
+  const from=document.getElementById('finder-from')?.value;
+  const to=document.getElementById('finder-to')?.value;
+  const results=devices.filter(d=>{
+    if(dept&&d.department!==dept)return false;
+    if(status&&d.status!==status)return false;
+    if(type&&d.deviceType!==type)return false;
+    if(from&&d.imagingDate<new Date(from).getTime())return false;
+    if(to&&d.imagingDate>new Date(to).getTime()+86400000)return false;
+    return true;
+  });
+  const el=document.getElementById('finder-results');
+  if(!results.length){el.innerHTML='<div style="color:var(--text3);font-size:13px;padding:12px 0">No devices match.</div>';return}
+  el.innerHTML=`<table style="margin-top:12px"><thead><tr><th>Name</th><th>Type</th><th>Status</th><th>Dept</th></tr></thead><tbody>
+${results.slice(0,25).map(d=>`<tr onclick="openDrawer('${d.id}')"><td class="mono" style="color:var(--accent2)">${esc(d.deviceName)}</td><td>${esc(d.deviceType)}</td><td><span class="badge ${sb(d.status)}">${esc(d.status)}</span></td><td>${esc(d.department)}${d.subdepartment?' / '+esc(d.subdepartment):''}</td></tr>`).join('')}
+</tbody></table>${results.length>25?`<div style="color:var(--text3);font-size:12px;margin-top:8px">…and ${results.length-25} more</div>`:''}`;
+}
+
+function renderExports(){renderTechs();renderClTemplate()}
+
+function renderTechs(){
+  const el=document.getElementById('techs-list');
+  if(!techs.length){el.innerHTML='<div style="color:var(--text3);font-size:13px;margin-bottom:8px">No techs added yet.</div>';return}
+  el.innerHTML=techs.map(t=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(37,45,61,0.5)">
+<span style="font-size:13px">${esc(t.name)}</span>
+<button class="btn btn-danger btn-xs" onclick="delTech('${t.id}')">Remove</button>
+</div>`).join('');
+}
+
+function addTech(){
+  const n=document.getElementById('new-tech').value.trim();
+  if(!n)return;
+  techs.push({id:uid(),name:n});save();
+  document.getElementById('new-tech').value='';
+  renderTechs();toast('Tech added');
+}
+function delTech(id){techs=techs.filter(x=>x.id!==id);save();renderTechs();toast('Removed')}
+
+function renderClTemplate(){
+  const el=document.getElementById('cl-template-list');
+  if(!clTemplate.length){el.innerHTML='<div style="color:var(--text3);font-size:13px;margin-bottom:8px">No steps yet.</div>';return}
+  el.innerHTML=clTemplate.map(s=>`<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid rgba(37,45,61,0.5)">
+<span style="flex:1;font-size:13px">${esc(s.label)}</span>
+<button class="btn btn-danger btn-xs" onclick="delClStep('${s.id}')">Remove</button>
+</div>`).join('');
+}
+
+function addClStep(){
+  const label=document.getElementById('new-cl-step').value.trim();
+  if(!label)return;
+  clTemplate.push({id:uid(),label});save();
+  document.getElementById('new-cl-step').value='';
+  renderClTemplate();toast('Step added');
+}
+function delClStep(id){clTemplate=clTemplate.filter(x=>x.id!==id);save();renderClTemplate();toast('Step removed')}
+
+function exportCSV(){
+  if(!devices.length){toast('No devices to export','err');return}
+  const headers=['Device Name','Asset Tag','Service Tag','Department','Sub-Department','Device Type','Assigned User','Location','Status','Windows Version','BitLocker','Imaging Tech','Imaging Date'];
+  const rows=devices.map(d=>[d.deviceName,d.assetTag,d.serviceTag,d.department,d.subdepartment,d.deviceType,d.assignedUser,d.location,d.status,d.windowsVersion,d.bitlocker?'Yes':'No',d.imagingTech,new Date(d.imagingDate).toLocaleString()].map(v=>`"${String(v||'').replace(/"/g,'""')}"`).join(','));
+  download('devices.csv','text/csv',[headers.join(','),...rows].join('\n'));
+  toast('CSV exported');
+}
+
+function exportJSON(){
+  download('techops-backup.json','application/json',JSON.stringify({devices,departments,scripts,knowledge,techs,clTemplate,exportedAt:new Date().toISOString(),version:'2.1'},null,2));
+  toast('JSON backup exported');
+}
+
+function importJSON(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    try{
+      const data=JSON.parse(ev.target.result);
+      const merge=(arr,src)=>{if(!src)return arr;const ids=new Set(arr.map(x=>x.id));return[...arr,...src.filter(x=>!ids.has(x.id))]};
+      devices=merge(devices,data.devices);
+      departments=merge(departments,data.departments);
+      scripts=merge(scripts,data.scripts);
+      knowledge=merge(knowledge,data.knowledge);
+      techs=merge(techs,data.techs);
+      if(data.clTemplate)clTemplate=merge(clTemplate,data.clTemplate);
+      save();toast('Import successful');renderDashboard();
+    }catch{toast('Invalid JSON file','err')}
+  };
+  reader.readAsText(file);e.target.value='';
+}
+
+function clearAll(){
+  if(!confirm('Delete ALL data? This cannot be undone.'))return;
+  if(prompt('Type CONFIRM to proceed:')!=='CONFIRM'){toast('Cancelled');return}
+  ['devices','departments','scripts','knowledge','techs','clTemplate'].forEach(k=>localStorage.removeItem(k));
+  devices=[];departments=[];scripts=[];knowledge=[];techs=[];clTemplate=[];
+  save();toast('All data cleared');renderDashboard();
+}
+
+function init(){
+  if(window.innerWidth<768)document.getElementById('mobile-menu-btn').style.display='flex';
+  renderDashboard();
+}
+
+window.addEventListener('load',()=>{
+  document.getElementById('login-pass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
+  if(S.getStr('authVerified')==='true'){
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('app').classList.add('visible');
+    init();
+  }
+});
+</script>
+</body>
+</html>
