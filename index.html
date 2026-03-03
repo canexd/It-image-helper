@@ -1033,7 +1033,7 @@ function updateTicket(){
   const tech=document.getElementById('tkt-tech').value.trim();
   const dateVal=document.getElementById('tkt-date').value;
   const notes=document.getElementById('tkt-notes').value.trim();
-  const dateStr=dateVal?new Date(dateVal).toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}):'';
+  const dateStr=dateVal?new Date(dateVal+'T12:00:00').toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}):'';
   if(!name&&!asset){document.getElementById('ticket-out').textContent='Fill in the fields on the left to generate a ticket note.';return}
   let lines=[];
   lines.push(`Device Imaging — ${dateStr||'N/A'}`);
@@ -1112,4 +1112,4 @@ window.addEventListener('load',()=>{
 });
 </script>
 </body>
-</html>
+  </html>
