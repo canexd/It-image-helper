@@ -382,6 +382,9 @@ tbody td{padding:11px 12px;color:var(--text2)}
 <div class="field"><label>Imaging Date</label><input type="date" id="tkt-date" oninput="updateTicket()" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:9px 12px;color:var(--text);outline:none;font-size:13px;width:100%"></div>
 </div>
 <div class="form-row">
+<div class="field"><label>Ticket Template</label><select id="tkt-template" onchange="updateTicket()"><option value="imaging-complete">Imaging Complete</option><option value="reimage-required">Reimage Required</option><option value="loaner-issued">Loaner Issued</option></select></div>
+</div>
+<div class="form-row">
 <div class="field"><label>Additional Notes (optional)</label><textarea id="tkt-notes" placeholder="e.g. Installed extra software, domain joined to county.local…" style="min-height:60px" oninput="updateTicket()"></textarea></div>
 </div>
 </div>
@@ -548,6 +551,7 @@ function renderDInfo(d){
   document.getElementById('drawer-body').innerHTML=`
 <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--border)">
 <button class="btn btn-primary btn-sm" onclick="closeDrawer();openDeviceModal('${d.id}')">Edit Device</button>
+<button class="btn btn-secondary btn-sm" onclick="openTicketFromDevice('${d.id}')">Generate Ticket</button>
 </div>
 ${[
 ['Device Name',`<span class="mono" style="color:var(--accent2);font-size:15px;font-weight:700">${esc(d.deviceName)}</span>`,d.deviceName],
@@ -702,6 +706,7 @@ function renderDevices(){
 <td style="color:var(--text3);font-size:12px;font-family:var(--mono)">${dateStr}</td>
 <td>${pct===null?'<span style="color:var(--text3);font-size:11px">—</span>':pct===100?'<span class="badge bg">✓ Done</span>':`<span class="badge bb">${pct}%</span>`}</td>
 <td onclick="event.stopPropagation()" style="white-space:nowrap">
+<button class="btn btn-secondary btn-xs" onclick="openTicketFromDevice('${d.id}')">Ticket</button>
 <button class="btn btn-secondary btn-xs" onclick="openDeviceModal('${d.id}')">Edit</button>
 <button class="btn btn-danger btn-xs" style="margin-left:4px" onclick="delDevice('${d.id}')">Del</button>
 </td></tr>`;}).join('');
@@ -1016,13 +1021,30 @@ function ticketPickDevice(){
   const id=document.getElementById('tkt-device-pick').value;
   if(!id)return;
   const d=devices.find(x=>x.id===id);if(!d)return;
+  fillTicketFieldsFromDevice(d);
+  updateTicket();
+}
+
+function fillTicketFieldsFromDevice(d){
   document.getElementById('tkt-name').value=d.deviceName||'';
   document.getElementById('tkt-asset').value=fullAsset(d);
   document.getElementById('tkt-user').value=d.assignedUser||'';
   document.getElementById('tkt-dept').value=d.department||'';
   if(d.imagingTech){const sel=document.getElementById('tkt-tech');for(let o of sel.options){if(o.value===d.imagingTech){o.selected=true;break}}}
   if(d.imagingDate)document.getElementById('tkt-date').value=new Date(d.imagingDate).toISOString().split('T')[0];
-  updateTicket();
+}
+
+function openTicketFromDevice(id){
+  navigate('ticket');
+  const d=devices.find(x=>x.id===id);if(!d)return;
+  const pick=document.getElementById('tkt-device-pick');
+  if(pick){
+    pick.value=id;
+    if(pick.value===id)ticketPickDevice();
+    else{fillTicketFieldsFromDevice(d);updateTicket();}
+  }
+  closeDrawer();
+  toast('Ticket pre-filled from device');
 }
 
 function updateTicket(){
@@ -1032,7 +1054,13 @@ function updateTicket(){
   const dept=document.getElementById('tkt-dept').value.trim();
   const tech=document.getElementById('tkt-tech').value.trim();
   const dateVal=document.getElementById('tkt-date').value;
+  const template=document.getElementById('tkt-template').value;
   const notes=document.getElementById('tkt-notes').value.trim();
+  const templateLines={
+    'imaging-complete':'Imaged this device and completed standard setup.',
+    'reimage-required':'Device requires reimage to resolve the reported issue. Backed up user data and prepared rebuild steps.',
+    'loaner-issued':'Issued this device as a temporary loaner while the primary device is being repaired.'
+  };
   const dateStr=dateVal?new Date(dateVal+'T12:00:00').toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}):'';
   if(!name&&!asset){document.getElementById('ticket-out').textContent='Fill in the fields on the left to generate a ticket note.';return}
   let lines=[];
@@ -1045,7 +1073,7 @@ function updateTicket(){
   if(tech)lines.push(`Imaged By:      ${tech}`);
   if(dateStr)lines.push(`Date Imaged:    ${dateStr}`);
   lines.push('─'.repeat(36));
-  lines.push(`Imaged this device and completed setup.`);
+  lines.push(templateLines[template]||templateLines['imaging-complete']);
   if(notes)lines.push('','Notes:',notes);
   document.getElementById('ticket-out').textContent=lines.join('\n');
 }
@@ -1059,6 +1087,7 @@ function copyTicket(){
 function clearTicket(){
   ['tkt-name','tkt-asset','tkt-user','tkt-dept','tkt-notes'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});
   document.getElementById('tkt-device-pick').value='';
+  document.getElementById('tkt-template').value='imaging-complete';
   document.getElementById('tkt-tech').value='';
   document.getElementById('tkt-date').value=todayVal();
   document.getElementById('ticket-out').textContent='Fill in the fields on the left to generate a ticket note.';
