@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TechOps Companion</title>
+<title>Cane IT</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap');
 :root{
@@ -28,7 +28,7 @@ input,select,textarea,button{font-family:var(--sans);font-size:14px}
 #login-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:1000}
 .login-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);padding:48px 40px;width:360px;text-align:center}
 .login-logo{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--accent);text-transform:uppercase;margin-bottom:32px}
-.login-logo span{display:block;font-size:24px;letter-spacing:0;color:var(--text);font-weight:700;margin-top:8px}
+.login-logo span{display:block;font-size:28px;letter-spacing:0;color:var(--text);font-weight:700;margin-top:8px}
 .login-card h2{font-size:18px;font-weight:600;margin-bottom:6px}
 .login-card p{color:var(--text2);font-size:13px;margin-bottom:28px}
 .login-field{margin-bottom:16px}
@@ -43,13 +43,16 @@ input,select,textarea,button{font-family:var(--sans);font-size:14px}
 .btn-green{background:var(--green-dim);color:var(--green);border:1px solid rgba(16,185,129,0.2)}.btn-green:hover{background:var(--green);color:#fff}
 .btn-sm{padding:5px 12px;font-size:13px}.btn-xs{padding:3px 8px;font-size:12px}
 .btn-full{width:100%;justify-content:center}
+.copy-btn{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:4px;border:1px solid var(--border);background:var(--bg4);cursor:pointer;color:var(--text3);transition:all var(--trans);flex-shrink:0}
+.copy-btn:hover{border-color:var(--accent);color:var(--accent)}
+.copy-btn svg{pointer-events:none}
 
 #app{display:flex;height:100vh;opacity:0;transition:opacity 0.3s}
 #app.visible{opacity:1}
 #sidebar{width:var(--sidebar);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden}
 .sidebar-header{padding:20px 16px 16px;border-bottom:1px solid var(--border)}
 .sidebar-logo{font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--accent);text-transform:uppercase}
-.sidebar-logo span{display:block;font-size:15px;letter-spacing:0;color:var(--text);font-weight:700;margin-top:4px;line-height:1.2}
+.sidebar-logo span{display:block;font-size:17px;letter-spacing:0;color:var(--text);font-weight:700;margin-top:4px;line-height:1.2}
 .sidebar-nav{flex:1;overflow-y:auto;padding:10px 8px}
 .nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--radius);color:var(--text2);cursor:pointer;transition:all var(--trans);margin-bottom:2px;font-size:13.5px;font-weight:500;white-space:nowrap}
 .nav-item:hover{background:var(--bg3);color:var(--text)}
@@ -103,7 +106,10 @@ input,select,textarea,button{font-family:var(--sans);font-size:14px}
 
 table{width:100%;border-collapse:collapse;font-size:13px}
 thead tr{border-bottom:1px solid var(--border)}
-thead th{padding:10px 12px;text-align:left;font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em}
+thead th{padding:10px 12px;text-align:left;font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;cursor:pointer;user-select:none;white-space:nowrap}
+thead th:hover{color:var(--text2)}
+thead th .sort-arrow{margin-left:4px;opacity:0.5;font-size:10px}
+thead th.sorted .sort-arrow{opacity:1;color:var(--accent2)}
 tbody tr{border-bottom:1px solid rgba(37,45,61,0.5);transition:background var(--trans)}
 tbody tr:hover{background:var(--bg3);cursor:pointer}
 tbody td{padding:11px 12px;color:var(--text2)}
@@ -118,7 +124,7 @@ tbody td{padding:11px 12px;color:var(--text2)}
 
 .drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:500;opacity:0;pointer-events:none;transition:opacity var(--trans)}
 .drawer-overlay.open{opacity:1;pointer-events:all}
-.drawer{position:fixed;right:-600px;top:0;bottom:0;width:600px;background:var(--bg2);border-left:1px solid var(--border);z-index:501;overflow:hidden;transition:right 0.25s ease;display:flex;flex-direction:column}
+.drawer{position:fixed;right:-640px;top:0;bottom:0;width:640px;background:var(--bg2);border-left:1px solid var(--border);z-index:501;overflow:hidden;transition:right 0.25s ease;display:flex;flex-direction:column}
 .drawer.open{right:0}
 .drawer-header{padding:18px 24px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
 .drawer-header h3{font-size:15px;font-weight:700;font-family:var(--mono);color:var(--accent2);letter-spacing:0.04em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:80%}
@@ -127,16 +133,15 @@ tbody td{padding:11px 12px;color:var(--text2)}
 .dtab:hover{color:var(--text2);background:var(--bg3)}
 .dtab.active{color:var(--accent2);border-bottom-color:var(--accent)}
 .drawer-body{padding:20px 24px;flex:1;overflow-y:auto}
-.d-actions{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--border)}
-.detail-row{display:flex;justify-content:space-between;align-items:flex-start;padding:9px 0;border-bottom:1px solid rgba(37,45,61,0.5)}
+.detail-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(37,45,61,0.5)}
 .dl{font-size:12px;color:var(--text3);font-family:var(--mono);flex-shrink:0;padding-right:12px}
-.dv{font-size:13px;color:var(--text);font-weight:500;text-align:right;max-width:65%;word-break:break-word}
+.dv{font-size:13px;color:var(--text);font-weight:500;text-align:right;max-width:70%;word-break:break-word;display:flex;align-items:center;gap:8px;justify-content:flex-end}
 .mono{font-family:var(--mono)}
 .code-block{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;font-family:var(--mono);font-size:12px;color:var(--green);white-space:pre-wrap;word-break:break-all}
 
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:600;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity var(--trans)}
 .modal-overlay.open{opacity:1;pointer-events:all}
-.modal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);padding:28px;width:560px;max-width:92vw;max-height:88vh;overflow-y:auto;transform:scale(0.95);transition:transform var(--trans)}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);padding:28px;width:580px;max-width:92vw;max-height:88vh;overflow-y:auto;transform:scale(0.95);transition:transform var(--trans)}
 .modal-overlay.open .modal{transform:scale(1)}
 .modal-title{font-size:17px;font-weight:600;margin-bottom:20px}
 .modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}
@@ -160,10 +165,12 @@ tbody td{padding:11px 12px;color:var(--text2)}
 .script-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);padding:16px;margin-bottom:10px;transition:border-color var(--trans)}
 .script-card:hover{border-color:var(--border2)}
 .script-card.pinned{border-color:rgba(245,158,11,0.3);background:rgba(245,158,11,0.02)}
-.kb-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);padding:16px;margin-bottom:10px;cursor:pointer;transition:border-color var(--trans)}
+.kb-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);padding:16px;margin-bottom:10px;transition:border-color var(--trans)}
 .kb-card:hover{border-color:var(--border2)}
-.kb-body{font-size:13px;color:var(--text2);line-height:1.6;margin:8px 0;max-height:80px;overflow:hidden;mask-image:linear-gradient(to bottom,black 60%,transparent)}
-.kb-body.expanded{max-height:none;mask-image:none}
+.kb-body{font-size:13px;color:var(--text2);line-height:1.6;margin:8px 0;white-space:pre-wrap;word-break:break-word}
+.kb-links{margin-top:8px;display:flex;flex-wrap:wrap;gap:6px}
+.kb-link{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:4px;font-size:12px;color:var(--accent2);background:var(--accent-glow);border:1px solid rgba(59,130,246,0.2);text-decoration:none;transition:all var(--trans)}
+.kb-link:hover{background:rgba(59,130,246,0.25);border-color:var(--accent)}
 .hl{background:rgba(245,158,11,0.3);border-radius:2px;padding:0 2px}
 
 .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
@@ -188,6 +195,11 @@ tbody td{padding:11px 12px;color:var(--text2)}
 .tl-meta{font-size:11px;color:var(--text3);font-family:var(--mono);margin-bottom:5px}
 .tl-body{font-size:13px;color:var(--text2);background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;line-height:1.55}
 
+/* CHECKLISTS TAB */
+.cl-tab-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.cl-tab-btn{padding:6px 14px;border-radius:var(--radius);border:1px solid var(--border);background:var(--bg3);color:var(--text2);cursor:pointer;font-size:13px;font-weight:500;transition:all var(--trans)}
+.cl-tab-btn:hover{border-color:var(--border2);color:var(--text)}
+.cl-tab-btn.active{background:var(--accent-glow);border-color:var(--accent);color:var(--accent2)}
 .cl-item{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-bottom:1px solid rgba(37,45,61,0.5);transition:background var(--trans)}
 .cl-item:hover{background:rgba(255,255,255,0.02)}
 .cl-item:last-child{border-bottom:none}
@@ -197,8 +209,21 @@ tbody td{padding:11px 12px;color:var(--text2)}
 .prog-wrap{height:6px;background:var(--bg4);border-radius:3px;margin-bottom:14px;overflow:hidden}
 .prog-bar{height:100%;background:var(--green);border-radius:3px;transition:width 0.3s ease}
 
+.cl-section{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);margin-bottom:16px;overflow:hidden}
+.cl-section-hdr{padding:12px 16px;background:var(--bg3);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.cl-section-title{font-size:13px;font-weight:600;color:var(--text)}
+.cl-section-badge{font-family:var(--mono);font-size:11px;color:var(--text3)}
+
 .subdept-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid rgba(37,45,61,0.4)}
 .subdept-row:last-child{border-bottom:none}
+
+/* KB view modal */
+.kb-view{padding:0}
+.kb-view-title{font-size:18px;font-weight:700;margin-bottom:8px;line-height:1.3}
+.kb-view-meta{font-size:12px;color:var(--text3);font-family:var(--mono);margin-bottom:16px}
+.kb-view-body{font-size:14px;color:var(--text2);line-height:1.7;white-space:pre-wrap;word-break:break-word;margin-bottom:16px}
+.kb-view-links{margin-top:12px}
+.kb-view-links-title{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;font-family:var(--mono)}
 
 @media(max-width:768px){
 #sidebar{position:fixed;left:-240px;top:0;bottom:0;z-index:400;transition:left var(--trans)}
@@ -214,7 +239,7 @@ tbody td{padding:11px 12px;color:var(--text2)}
 
 <div id="login-screen">
 <div class="login-card">
-<div class="login-logo">IT Operations<span>TechOps<br>Companion</span></div>
+<div class="login-logo">IT Operations<span>Cane IT</span></div>
 <h2>Sign In</h2>
 <p>Enter your access password to continue</p>
 <div class="login-field"><input type="password" id="login-pass" placeholder="Password"></div>
@@ -226,13 +251,14 @@ tbody td{padding:11px 12px;color:var(--text2)}
 <div id="app">
 <div id="sidebar">
 <div class="sidebar-header">
-<div class="sidebar-logo">TechOps<span>Companion<br>v2.1</span></div>
+<div class="sidebar-logo">IT Operations<span>Cane IT<br><span style="font-size:11px;color:var(--text3)">v3.0</span></span></div>
 </div>
 <nav class="sidebar-nav">
 <div class="nav-item active" data-tab="dashboard"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</div>
 <div class="nav-item" data-tab="devices"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>Devices</div>
 <div class="nav-item" data-tab="bulk"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>Bulk Imaging</div>
 <div class="nav-item" data-tab="naming"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Naming Rules</div>
+<div class="nav-item" data-tab="checklists"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>Checklists</div>
 <div class="nav-item" data-tab="scripts"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>Script Library</div>
 <div class="nav-item" data-tab="knowledge"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>Knowledge</div>
 <div class="nav-item" data-tab="tools"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>Quick Tools</div>
@@ -267,7 +293,7 @@ tbody td{padding:11px 12px;color:var(--text2)}
 </div>
 <div class="search-bar">
 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-<input type="text" id="dev-search" placeholder="Search name, asset tag, service tag, user, department, status…" oninput="renderDevices()">
+<input type="text" id="dev-search" placeholder="Search name, asset tag, service tag, user, department…" oninput="renderDevices()">
 </div>
 <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
 <select class="fsel" id="dev-f-dept" onchange="renderDevices()"><option value="">All Departments</option></select>
@@ -275,7 +301,18 @@ tbody td{padding:11px 12px;color:var(--text2)}
 <select class="fsel" id="dev-f-type" onchange="renderDevices()"><option value="">All Types</option><option>Desktop</option><option>Laptop</option><option>Tablet</option></select>
 </div>
 <table>
-<thead><tr><th>Device Name</th><th>Asset Tag</th><th>Type</th><th>Department</th><th>Sub-Dept</th><th>User</th><th>Status</th><th>Checklist</th><th>Actions</th></tr></thead>
+<thead><tr>
+<th onclick="sortDevices('deviceName')">Device Name <span class="sort-arrow" id="sa-deviceName"></span></th>
+<th onclick="sortDevices('assetTag')">Asset Tag <span class="sort-arrow" id="sa-assetTag"></span></th>
+<th>Type</th>
+<th onclick="sortDevices('department')">Department <span class="sort-arrow" id="sa-department"></span></th>
+<th>Sub-Dept</th>
+<th>User</th>
+<th onclick="sortDevices('status')">Status <span class="sort-arrow" id="sa-status"></span></th>
+<th onclick="sortDevices('imagingDate')">Imaged <span class="sort-arrow" id="sa-imagingDate"></span></th>
+<th>Checklist</th>
+<th>Actions</th>
+</tr></thead>
 <tbody id="dev-tbody"></tbody>
 </table>
 <div class="empty" id="dev-empty" style="display:none">No devices found. Add your first device above.</div>
@@ -295,8 +332,9 @@ tbody td{padding:11px 12px;color:var(--text2)}
 <div class="field"><label>Device Type</label><select id="bulk-type" onchange="refreshBulkNames()"><option value="">-- Select --</option><option>Desktop</option><option>Laptop</option><option>Tablet</option></select></div>
 <div class="field"><label>Location</label><input type="text" id="bulk-loc" placeholder="Building / Room"></div>
 </div>
-<div class="form-row c2">
+<div class="form-row c3">
 <div class="field"><label>Imaging Tech</label><select id="bulk-tech"><option value="">-- Select --</option></select></div>
+<div class="field"><label>Imaging Date</label><input type="date" id="bulk-date" class="date-inp" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:9px 12px;color:var(--text);outline:none;font-size:13px;width:100%"></div>
 <div class="field"><label>Quick-Add Tech</label>
 <div style="display:flex;gap:6px">
 <input type="text" id="bulk-new-tech" placeholder="New tech name" style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:9px 12px;color:var(--text);outline:none;font-size:13px" onkeydown="if(event.key==='Enter')bulkAddTech()">
@@ -329,6 +367,20 @@ tbody td{padding:11px 12px;color:var(--text2)}
 <div id="naming-list"></div>
 </div>
 
+<!-- CHECKLISTS -->
+<div class="tab-panel" id="tab-checklists">
+<div class="section-header">
+<div class="section-title">Checklists</div>
+<button class="btn btn-primary btn-sm" onclick="openChecklistModal()">+ New Checklist</button>
+</div>
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center">
+<div style="font-size:13px;color:var(--text3);margin-right:4px">Filter:</div>
+<select class="fsel" id="cl-f-dept" onchange="renderChecklists()"><option value="">All Departments</option></select>
+<select class="fsel" id="cl-f-type" onchange="renderChecklists()"><option value="">All Device Types</option><option>Desktop</option><option>Laptop</option><option>Tablet</option><option>All Devices</option></select>
+</div>
+<div id="checklists-list"></div>
+</div>
+
 <!-- SCRIPTS -->
 <div class="tab-panel" id="tab-scripts">
 <div class="section-header">
@@ -355,15 +407,13 @@ tbody td{padding:11px 12px;color:var(--text2)}
 </div>
 <div class="search-bar">
 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-<input type="text" id="kb-search" placeholder="Search knowledge base…" oninput="renderKb()">
+<input type="text" id="kb-search" placeholder="Search by title or keyword…" oninput="renderKb()">
 </div>
 <div id="kb-list"></div>
 </div>
 
 <!-- QUICK TOOLS -->
 <div class="tab-panel" id="tab-tools">
-
-<!-- Row 1: Rename + Domain Join -->
 <div class="grid-2" style="margin-bottom:16px">
 <div class="tool-box" style="margin-bottom:0">
 <h3>🖥 Rename Computer</h3>
@@ -375,26 +425,17 @@ tbody td{padding:11px 12px;color:var(--text2)}
 <h3>🔗 Domain Join</h3>
 <div class="form-row c2">
 <div class="field"><label>Domain Name</label><input type="text" id="tool-domain" value="county.local" oninput="updateDomain()"></div>
-<div class="field"><label>Department OU</label>
-<select id="tool-ou" onchange="updateDomain()" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:9px 30px 9px 12px;color:var(--text);outline:none;appearance:none;background-image:url('data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%2364748b\' stroke-width=\'2\'%3E%3Cpath d=\'M6 9l6 6 6-6\'/%3E%3C/svg%3E');background-repeat:no-repeat;background-position:right 10px center"><option value="">-- Select --</option></select>
-</div>
+<div class="field"><label>Department OU</label><select id="tool-ou" onchange="updateDomain()" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:9px 30px 9px 12px;color:var(--text);outline:none;appearance:none"><option value="">-- Select --</option></select></div>
 </div>
 <div class="code-block" id="domain-out"></div>
 <button class="btn btn-secondary btn-sm" style="margin-top:8px" onclick="copyText(document.getElementById('domain-out').textContent)">Copy</button>
 </div>
 </div>
-
-<!-- Row 2: GPUpdate + AD User Lookup -->
 <div class="grid-2" style="margin-bottom:16px">
 <div class="tool-box" style="margin-bottom:0">
 <h3>🔄 Force Group Policy Update</h3>
 <div class="form-row c2">
-<div class="field"><label>Target</label>
-<select id="gp-target" onchange="updateGP()">
-<option value="local">Local Computer</option>
-<option value="remote">Remote Computer</option>
-</select>
-</div>
+<div class="field"><label>Target</label><select id="gp-target" onchange="updateGP()"><option value="local">Local Computer</option><option value="remote">Remote Computer</option></select></div>
 <div class="field" id="gp-remote-field" style="display:none"><label>Computer Name</label><input type="text" id="gp-computer" placeholder="DEPT00123L" oninput="updateGP()"></div>
 </div>
 <div class="code-block" id="gp-out"></div>
@@ -403,25 +444,18 @@ tbody td{padding:11px 12px;color:var(--text2)}
 <div class="tool-box" style="margin-bottom:0">
 <h3>👤 AD User Lookup</h3>
 <div class="form-row c2">
-<div class="field"><label>Username (samAccountName)</label><input type="text" id="ad-user" placeholder="jsmith" oninput="updateADUser()"></div>
+<div class="field"><label>Username</label><input type="text" id="ad-user" placeholder="jsmith" oninput="updateADUser()"></div>
 <div class="field"><label>Domain Controller (optional)</label><input type="text" id="ad-dc" placeholder="dc01.county.local" oninput="updateADUser()"></div>
 </div>
 <div class="code-block" id="ad-user-out"></div>
 <button class="btn btn-secondary btn-sm" style="margin-top:8px" onclick="copyText(document.getElementById('ad-user-out').textContent)">Copy</button>
 </div>
 </div>
-
-<!-- Row 3: Clear Print Spooler + Flush DNS -->
 <div class="grid-2" style="margin-bottom:16px">
 <div class="tool-box" style="margin-bottom:0">
 <h3>🖨 Clear Print Spooler</h3>
 <div class="form-row c2">
-<div class="field"><label>Target</label>
-<select id="spool-target" onchange="updateSpooler()">
-<option value="local">Local Computer</option>
-<option value="remote">Remote Computer</option>
-</select>
-</div>
+<div class="field"><label>Target</label><select id="spool-target" onchange="updateSpooler()"><option value="local">Local Computer</option><option value="remote">Remote Computer</option></select></div>
 <div class="field" id="spool-remote-field" style="display:none"><label>Computer Name</label><input type="text" id="spool-computer" placeholder="DEPT00123L" oninput="updateSpooler()"></div>
 </div>
 <div class="code-block" id="spool-out"></div>
@@ -430,20 +464,13 @@ tbody td{padding:11px 12px;color:var(--text2)}
 <div class="tool-box" style="margin-bottom:0">
 <h3>🌐 Flush DNS &amp; Reset Network</h3>
 <div class="form-row c2">
-<div class="field"><label>Target</label>
-<select id="dns-target" onchange="updateDNS()">
-<option value="local">Local Computer</option>
-<option value="remote">Remote Computer</option>
-</select>
-</div>
+<div class="field"><label>Target</label><select id="dns-target" onchange="updateDNS()"><option value="local">Local Computer</option><option value="remote">Remote Computer</option></select></div>
 <div class="field" id="dns-remote-field" style="display:none"><label>Computer Name</label><input type="text" id="dns-computer" placeholder="DEPT00123L" oninput="updateDNS()"></div>
 </div>
 <div class="code-block" id="dns-out"></div>
 <button class="btn btn-secondary btn-sm" style="margin-top:8px" onclick="copyText(document.getElementById('dns-out').textContent)">Copy</button>
 </div>
 </div>
-
-<!-- Row 4: Get Computer Info + Get Logged In User -->
 <div class="grid-2" style="margin-bottom:16px">
 <div class="tool-box" style="margin-bottom:0">
 <h3>💻 Get Computer Info</h3>
@@ -458,20 +485,14 @@ tbody td{padding:11px 12px;color:var(--text2)}
 <button class="btn btn-secondary btn-sm" style="margin-top:8px" onclick="copyText(document.getElementById('loggedin-out').textContent)">Copy</button>
 </div>
 </div>
-
-<!-- Row 5: Map Network Drive + Check Disk Space -->
 <div class="grid-2" style="margin-bottom:16px">
 <div class="tool-box" style="margin-bottom:0">
 <h3>📁 Map Network Drive</h3>
 <div class="form-row c3">
-<div class="field"><label>Drive Letter</label>
-<select id="drive-letter" onchange="updateDrive()" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:9px 12px;color:var(--text);outline:none">
-${['G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'].map(l=>`<option value="${l}">${l}:</option>`).join('')}
-</select>
-</div>
+<div class="field"><label>Drive Letter</label><select id="drive-letter" onchange="updateDrive()" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:9px 12px;color:var(--text);outline:none"><option>G</option><option>H</option><option>I</option><option>J</option><option>K</option><option>L</option><option>M</option><option>N</option><option>O</option><option>P</option><option>Q</option><option>R</option><option>S</option><option>T</option><option>U</option><option>V</option><option>W</option><option>X</option><option>Y</option><option>Z</option></select></div>
 <div class="field" style="grid-column:span 2"><label>UNC Path</label><input type="text" id="drive-path" placeholder="\\\\server\\share" oninput="updateDrive()"></div>
 </div>
-<div class="toggle-wrap" style="margin-bottom:10px"><label class="toggle"><input type="checkbox" id="drive-persist" onchange="updateDrive()" checked><span class="toggle-slider"></span></label><span style="font-size:12px;color:var(--text2)">Persistent (survives reboot)</span></div>
+<div class="toggle-wrap" style="margin-bottom:10px"><label class="toggle"><input type="checkbox" id="drive-persist" onchange="updateDrive()" checked><span class="toggle-slider"></span></label><span style="font-size:12px;color:var(--text2)">Persistent</span></div>
 <div class="code-block" id="drive-out"></div>
 <button class="btn btn-secondary btn-sm" style="margin-top:8px" onclick="copyText(document.getElementById('drive-out').textContent)">Copy</button>
 </div>
@@ -482,8 +503,6 @@ ${['G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','
 <button class="btn btn-secondary btn-sm" style="margin-top:8px" onclick="copyText(document.getElementById('disk-out').textContent)">Copy</button>
 </div>
 </div>
-
-<!-- Row 6: Enable RDP + Set AD Computer Description -->
 <div class="grid-2" style="margin-bottom:16px">
 <div class="tool-box" style="margin-bottom:0">
 <h3>🖥 Enable Remote Desktop</h3>
@@ -501,26 +520,17 @@ ${['G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','
 <button class="btn btn-secondary btn-sm" style="margin-top:8px" onclick="copyText(document.getElementById('addesc-out').textContent)">Copy</button>
 </div>
 </div>
-
-<!-- Device Finder -->
 <div class="tool-box">
 <h3>🔍 Device Finder</h3>
-<div class="form-row c2">
-<div class="field"><label>Department</label>
-<select id="finder-dept" onchange="runFinder()" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:9px 30px 9px 12px;color:var(--text);outline:none;appearance:none;background-image:url('data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%2364748b\' stroke-width=\'2\'%3E%3Cpath d=\'M6 9l6 6 6-6\'/%3E%3C/svg%3E');background-repeat:no-repeat;background-position:right 10px center"><option value="">All</option></select>
-</div>
-<div class="field"><label>Status</label>
-<select id="finder-status" onchange="runFinder()" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:9px 30px 9px 12px;color:var(--text);outline:none;appearance:none;background-image:url('data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%2364748b\' stroke-width=\'2\'%3E%3Cpath d=\'M6 9l6 6 6-6\'/%3E%3C/svg%3E');background-repeat:no-repeat;background-position:right 10px center"><option value="">All</option><option>Active</option><option>Loaner</option><option>Retired</option></select>
-</div>
-<div class="field"><label>Device Type</label>
-<select id="finder-type" onchange="runFinder()" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:9px 30px 9px 12px;color:var(--text);outline:none;appearance:none;background-image:url('data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%2364748b\' stroke-width=\'2\'%3E%3Cpath d=\'M6 9l6 6 6-6\'/%3E%3C/svg%3E');background-repeat:no-repeat;background-position:right 10px center"><option value="">All</option><option>Desktop</option><option>Laptop</option><option>Tablet</option></select>
-</div>
+<div class="form-row c4">
+<div class="field"><label>Department</label><select id="finder-dept" onchange="runFinder()" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:9px 12px;color:var(--text);outline:none"><option value="">All</option></select></div>
+<div class="field"><label>Status</label><select id="finder-status" onchange="runFinder()" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:9px 12px;color:var(--text);outline:none"><option value="">All</option><option>Active</option><option>Loaner</option><option>Retired</option></select></div>
+<div class="field"><label>Device Type</label><select id="finder-type" onchange="runFinder()" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:9px 12px;color:var(--text);outline:none"><option value="">All</option><option>Desktop</option><option>Laptop</option><option>Tablet</option></select></div>
 <div class="field"><label>Date From</label><input type="date" id="finder-from" class="date-inp" onchange="runFinder()"></div>
 <div class="field"><label>Date To</label><input type="date" id="finder-to" class="date-inp" onchange="runFinder()"></div>
 </div>
 <div id="finder-results"></div>
 </div>
-
 </div>
 
 <!-- EXPORTS -->
@@ -530,27 +540,14 @@ ${['G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','
 <h3>📤 Export Data</h3>
 <p style="color:var(--text2);font-size:13px;margin-bottom:16px;line-height:1.5">Export for backups or sharing between techs.</p>
 <div style="display:flex;flex-direction:column;gap:10px">
-<button class="btn btn-secondary" onclick="exportCSV()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Export Devices CSV</button>
-<button class="btn btn-secondary" onclick="exportJSON()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Export Full JSON Backup</button>
+<button class="btn btn-secondary" onclick="exportCSV()">Export Devices CSV</button>
+<button class="btn btn-secondary" onclick="exportJSON()">Export Full JSON Backup</button>
 </div>
 </div>
 <div class="tool-box">
 <h3>📥 Import Data</h3>
 <p style="color:var(--text2);font-size:13px;margin-bottom:16px;line-height:1.5">Import a JSON backup. Data is merged — no duplicates overwritten.</p>
-<label class="btn btn-secondary" style="cursor:pointer">
-<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
-Import JSON Backup
-<input type="file" accept=".json" style="display:none" onchange="importJSON(event)">
-</label>
-</div>
-<div class="tool-box">
-<h3>✅ Imaging Checklist Template</h3>
-<p style="color:var(--text2);font-size:13px;margin-bottom:12px;line-height:1.5">Global steps every device must complete. Appears on each device's Checklist tab.</p>
-<div id="cl-template-list"></div>
-<div style="display:flex;gap:8px;margin-top:10px">
-<input type="text" id="new-cl-step" placeholder="e.g. Domain join confirmed" style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:8px 12px;color:var(--text);outline:none" onkeydown="if(event.key==='Enter')addClStep()">
-<button class="btn btn-primary btn-sm" onclick="addClStep()">Add Step</button>
-</div>
+<label class="btn btn-secondary" style="cursor:pointer">Import JSON Backup<input type="file" accept=".json" style="display:none" onchange="importJSON(event)"></label>
 </div>
 <div class="tool-box">
 <h3>👥 Manage Techs</h3>
@@ -560,17 +557,17 @@ Import JSON Backup
 <button class="btn btn-primary btn-sm" onclick="addTech()">Add</button>
 </div>
 </div>
-<div class="tool-box" style="grid-column:1/-1;border-color:rgba(239,68,68,0.2)">
+<div class="tool-box" style="border-color:rgba(239,68,68,0.2)">
 <h3 style="color:var(--red)">⚠ Danger Zone</h3>
-<p style="color:var(--text2);font-size:13px;margin-bottom:16px">Permanently deletes all data stored in this browser. Cannot be undone.</p>
+<p style="color:var(--text2);font-size:13px;margin-bottom:16px">Permanently deletes all data stored in this browser.</p>
 <button class="btn btn-danger" onclick="clearAll()">Clear All Data</button>
 </div>
 </div>
 </div>
 
-</div><!-- /content -->
-</div><!-- /main -->
-</div><!-- /app -->
+</div>
+</div>
+</div>
 
 <!-- Drawer -->
 <div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawer()"></div>
@@ -596,10 +593,10 @@ Import JSON Backup
 
 <script>
 const S={
-get(k){try{return JSON.parse(localStorage.getItem(k))||[]}catch{return[]}},
-set(k,v){localStorage.setItem(k,JSON.stringify(v))},
-getStr(k){return localStorage.getItem(k)||''},
-setStr(k,v){localStorage.setItem(k,v)}
+  get(k){try{return JSON.parse(localStorage.getItem(k))||[]}catch{return[]}},
+  set(k,v){localStorage.setItem(k,JSON.stringify(v))},
+  getStr(k){return localStorage.getItem(k)||''},
+  setStr(k,v){localStorage.setItem(k,v)}
 };
 
 let devices=S.get('devices'),
@@ -607,27 +604,32 @@ let devices=S.get('devices'),
     scripts=S.get('scripts'),
     knowledge=S.get('knowledge'),
     techs=S.get('techs'),
-    clTemplate=S.get('clTemplate');
+    checklists=S.get('checklists2')||[];
 
 let bulkRows=[],
     editDevId=null,
     editScriptId=null,
     editKbId=null,
     editNamingId=null,
+    editClId=null,
     drawerDevId=null,
-    drawerTab='info';
+    drawerTab='info',
+    devSortField='imagingDate',
+    devSortAsc=false;
 
 function save(){
   S.set('devices',devices);S.set('departments',departments);
   S.set('scripts',scripts);S.set('knowledge',knowledge);
-  S.set('techs',techs);S.set('clTemplate',clTemplate);
+  S.set('techs',techs);S.set('checklists2',checklists);
 }
 
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
 function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 function toast(msg,type='ok'){const t=document.getElementById('toast');t.textContent=msg;t.className='toast '+type+' show';clearTimeout(t._t);t._t=setTimeout(()=>t.className='toast',3000)}
-function copyText(txt){navigator.clipboard.writeText(txt).then(()=>toast('Copied to clipboard'))}
+function copyText(txt){if(!txt||txt.trim()==='—')return;navigator.clipboard.writeText(txt).then(()=>toast('Copied!'))}
+function copyBtn(val){return`<button class="copy-btn" onclick="copyText(${JSON.stringify(String(val||''))})" title="Copy"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>`}
 function download(name,mime,data){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([data],{type:mime}));a.download=name;a.click()}
+function todayVal(){return new Date().toISOString().split('T')[0]}
 
 function doLogin(){
   if(document.getElementById('login-pass').value==='1212'){
@@ -643,9 +645,9 @@ function toggleSidebar(){document.getElementById('sidebar').classList.toggle('op
 function navigate(tab){
   document.querySelectorAll('.nav-item').forEach(el=>el.classList.toggle('active',el.dataset.tab===tab));
   document.querySelectorAll('.tab-panel').forEach(el=>el.classList.toggle('active',el.id==='tab-'+tab));
-  const titles={dashboard:'Dashboard',devices:'Device Registry',bulk:'Bulk Imaging',naming:'Naming Rules',scripts:'Script Library',knowledge:'Knowledge Base',tools:'Quick Tools',exports:'Exports & Settings'};
+  const titles={dashboard:'Dashboard',devices:'Device Registry',bulk:'Bulk Imaging',naming:'Naming Rules',checklists:'Checklists',scripts:'Script Library',knowledge:'Knowledge Base',tools:'Quick Tools',exports:'Exports & Settings'};
   document.getElementById('topbar-title').textContent=titles[tab]||tab;
-  ({dashboard:renderDashboard,devices:renderDevices,scripts:renderScripts,knowledge:renderKb,naming:renderNaming,bulk:renderBulk,tools:renderTools,exports:renderExports}[tab]||(() => {}))();
+  ({dashboard:renderDashboard,devices:renderDevices,scripts:renderScripts,knowledge:renderKb,naming:renderNaming,bulk:renderBulk,tools:renderTools,exports:renderExports,checklists:renderChecklists}[tab]||(() => {}))();
 }
 document.querySelectorAll('.nav-item').forEach(el=>el.addEventListener('click',()=>navigate(el.dataset.tab)));
 
@@ -677,66 +679,71 @@ function renderDrawer(){
 function sb(s){return s==='Active'?'bg':s==='Loaner'?'by':'br'}
 
 function renderDInfo(d){
-  const dt=new Date(d.imagingDate).toLocaleString();
-  const rename=`Rename-Computer -NewName "${d.deviceName}" -Restart`;
-  const ticket=`Device Name: ${d.deviceName}\nAsset Tag: ${d.assetTag}\nService Tag: ${d.serviceTag||'N/A'}\nDepartment: ${d.department}${d.subdepartment?' / '+d.subdepartment:''}\nAssigned User: ${d.assignedUser||'N/A'}\nLocation: ${d.location||'N/A'}\nStatus: ${d.status}\nImaging Tech: ${d.imagingTech||'N/A'}\nImaging Date: ${dt}\nBitLocker: ${d.bitlocker?'Confirmed':'Not Confirmed'}\nWindows: ${d.windowsVersion||'N/A'}`;
+  const dt=d.imagingDate?new Date(d.imagingDate).toLocaleDateString():'—';
   document.getElementById('drawer-body').innerHTML=`
-<div class="d-actions">
-<button class="btn btn-secondary btn-sm" onclick="copyText(${JSON.stringify(d.deviceName)})">Copy Name</button>
-<button class="btn btn-secondary btn-sm" onclick="copyText(${JSON.stringify(ticket)})">Copy Ticket</button>
-<button class="btn btn-secondary btn-sm" onclick="copyText(${JSON.stringify(rename)})">Copy Rename Script</button>
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--border)">
 <button class="btn btn-primary btn-sm" onclick="closeDrawer();openDeviceModal('${d.id}')">Edit Device</button>
 </div>
-${[['Device Name',`<span class="mono" style="color:var(--accent2);font-size:15px;font-weight:700">${esc(d.deviceName)}</span>`],
-['Asset Tag',`<span class="mono">${esc(d.assetTag)}</span>`],
-['Service Tag',`<span class="mono">${esc(d.serviceTag)||'—'}</span>`],
-['Department',esc(d.department)],
-['Sub-Department',esc(d.subdepartment)||'—'],
-['Device Type',esc(d.deviceType)],
-['Assigned User',esc(d.assignedUser)||'—'],
-['Location',esc(d.location)||'—'],
-['Status',`<span class="badge ${sb(d.status)}">${esc(d.status)}</span>`],
-['Windows Version',esc(d.windowsVersion)||'—'],
-['BitLocker',d.bitlocker?'<span style="color:var(--green)">✓ Confirmed</span>':'<span style="color:var(--text3)">Not Confirmed</span>'],
-['Imaging Tech',esc(d.imagingTech)||'—'],
-['Imaging Date',dt]
-].map(([l,v])=>`<div class="detail-row"><span class="dl">${l}</span><span class="dv">${v}</span></div>`).join('')}`;
+${[
+['Device Name', `<span class="mono" style="color:var(--accent2);font-size:15px;font-weight:700">${esc(d.deviceName)}</span>`, d.deviceName],
+['Asset Tag', `<span class="mono">${esc(d.assetTag)}</span>`, d.assetTag],
+['Service Tag', `<span class="mono">${esc(d.serviceTag)||'—'}</span>`, d.serviceTag],
+['Department', esc(d.department), null],
+['Sub-Department', esc(d.subdepartment)||'—', null],
+['Device Type', esc(d.deviceType), null],
+['Assigned User', esc(d.assignedUser)||'—', null],
+['Location', esc(d.location)||'—', null],
+['Status', `<span class="badge ${sb(d.status)}">${esc(d.status)}</span>`, null],
+['Windows Version', esc(d.windowsVersion)||'—', null],
+['Imaging Tech', esc(d.imagingTech)||'—', null],
+['Imaging Date', dt, null]
+].map(([l,v,copyVal])=>`<div class="detail-row"><span class="dl">${l}</span><span class="dv">${v}${copyVal?copyBtn(copyVal):''}</span></div>`).join('')}`;
 }
 
 function renderDChecklist(d){
-  const steps=clTemplate||[];
-  const state=d.checklistState||{};
-  if(!steps.length){
-    document.getElementById('drawer-body').innerHTML=`<div style="padding:20px 0;color:var(--text3);font-size:13px;line-height:1.7">No checklist steps defined yet.<br>Go to <strong style="color:var(--text2)">Exports → Imaging Checklist Template</strong> to add steps.</div>`;
+  // Find applicable checklists: matching dept or "All Departments", and matching device type or "All Devices"
+  const applicable=checklists.filter(cl=>{
+    const deptMatch=cl.department===''||cl.department===d.department;
+    const typeMatch=cl.deviceType===''||cl.deviceType==='All Devices'||cl.deviceType===d.deviceType;
+    return deptMatch&&typeMatch;
+  });
+  if(!applicable.length){
+    document.getElementById('drawer-body').innerHTML=`<div style="padding:20px 0;color:var(--text3);font-size:13px;line-height:1.7">No checklists apply to this device.<br>Go to <strong style="color:var(--text2)">Checklists</strong> to create one for ${esc(d.department)} / ${esc(d.deviceType)}.</div>`;
     return;
   }
-  const done=steps.filter(s=>state[s.id]?.checked).length;
-  const pct=Math.round((done/steps.length)*100);
-  document.getElementById('drawer-body').innerHTML=`
-<div style="margin-bottom:16px">
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-<span style="font-size:13px;color:var(--text2);font-weight:500">Completion</span>
-<span class="badge ${pct===100?'bg':'bb'}">${done}/${steps.length} — ${pct}%</span>
+  let html='';
+  applicable.forEach(cl=>{
+    const steps=cl.steps||[];
+    if(!steps.length)return;
+    const state=d.checklistState||{};
+    const clKey=cl.id+'::';
+    const done=steps.filter(s=>state[clKey+s.id]?.checked).length;
+    const pct=Math.round((done/steps.length)*100);
+    html+=`<div class="cl-section">
+<div class="cl-section-hdr">
+<span class="cl-section-title">${esc(cl.name)}</span>
+<span class="cl-section-badge">${cl.department||'All Depts'} · ${cl.deviceType||'All Types'} · <span class="badge ${pct===100?'bg':'bb'}">${pct}%</span></span>
 </div>
+<div style="padding:10px 16px 6px">
 <div class="prog-wrap"><div class="prog-bar" style="width:${pct}%"></div></div>
 </div>
-<div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius2);overflow:hidden">
 ${steps.map(step=>{
-  const s=state[step.id]||{};
+  const s=state[clKey+step.id]||{};
   return`<div class="cl-item">
-<input type="checkbox" class="cl-cb" ${s.checked?'checked':''} onchange="toggleClStep('${d.id}','${step.id}',this.checked)">
-<div>
-<div class="cl-label${s.checked?' done':''}">${esc(step.label)}</div>
+<input type="checkbox" class="cl-cb" ${s.checked?'checked':''} onchange="toggleClStep('${d.id}','${cl.id}','${step.id}',this.checked)">
+<div><div class="cl-label${s.checked?' done':''}">${esc(step.label)}</div>
 ${s.checked?`<div class="cl-who">${esc(s.tech||'—')} · ${new Date(s.ts).toLocaleString()}</div>`:''}
-</div>
-</div>`;}).join('')}
+</div></div>`;}).join('')}
 </div>`;
+  });
+  document.getElementById('drawer-body').innerHTML=html||`<div style="color:var(--text3);font-size:13px">No checklist steps found.</div>`;
 }
 
-function toggleClStep(devId,stepId,checked){
+function toggleClStep(devId,clId,stepId,checked){
   const d=devices.find(x=>x.id===devId);if(!d)return;
   if(!d.checklistState)d.checklistState={};
-  d.checklistState[stepId]={checked,tech:techs[0]?.name||'Unknown',ts:Date.now()};
+  const key=clId+'::'+stepId;
+  d.checklistState[key]={checked,tech:techs[0]?.name||'Unknown',ts:Date.now()};
   save();renderDrawer();renderDevices();
 }
 
@@ -754,7 +761,7 @@ ${notes.length?`<div class="timeline">${[...notes].reverse().map(n=>`
 <div class="tl-item">
 <div class="tl-meta">${esc(n.tech||'Unknown')} · ${new Date(n.ts).toLocaleString()}</div>
 <div class="tl-body">${esc(n.body)}</div>
-</div>`).join('')}</div>`:`<div style="color:var(--text3);font-size:13px">No notes yet. Add the first one above.</div>`}`;
+</div>`).join('')}</div>`:`<div style="color:var(--text3);font-size:13px">No notes yet.</div>`}`;
 }
 
 function addNote(devId){
@@ -768,10 +775,10 @@ function addNote(devId){
 }
 
 function renderDScripts(d){
+  const rename=`Rename-Computer -NewName "${d.deviceName}" -Restart`;
   const domain='county.local';
   const ou=d.subdepartment||d.department;
   const dc=domain.split('.').map(p=>`DC=${p}`).join(',');
-  const rename=`Rename-Computer -NewName "${d.deviceName}" -Restart`;
   const join=`Add-Computer -DomainName "${domain}" -OUPath "OU=${ou},OU=Departments,${dc}"`;
   document.getElementById('drawer-body').innerHTML=`
 <div style="margin-bottom:20px">
@@ -812,23 +819,30 @@ function subOpts(deptName,sel=''){
   return`<option value="">-- None (prefix: ${esc(dPrefix)}) --</option>`+(dept?.subdepts||[]).map(s=>`<option value="${esc(s.id)}"${s.id===sel?' selected':''}>${esc(s.name)} [${esc(dPrefix+s.prefix)}]</option>`).join('');
 }
 
+// ---- SORT ----
+function sortDevices(field){
+  if(devSortField===field)devSortAsc=!devSortAsc;
+  else{devSortField=field;devSortAsc=true;}
+  renderDevices();
+}
+
 function renderDashboard(){
-  const a=devices.filter(d=>d.status==='Active').length,
+  const active=devices.filter(d=>d.status==='Active'),
         l=devices.filter(d=>d.status==='Loaner').length,
         r=devices.filter(d=>d.status==='Retired').length;
   document.getElementById('dash-stats').innerHTML=`
-<div class="stat-card blue"><div class="stat-label">Total Devices</div><div class="stat-val" style="color:var(--accent2)">${devices.length}</div><div class="stat-sub">${departments.length} departments</div></div>
-<div class="stat-card green"><div class="stat-label">Active</div><div class="stat-val" style="color:var(--green)">${a}</div><div class="stat-sub">deployed</div></div>
-<div class="stat-card yellow"><div class="stat-label">Loaners</div><div class="stat-val" style="color:var(--yellow)">${l}</div><div class="stat-sub">in circulation</div></div>
-<div class="stat-card purple"><div class="stat-label">Scripts</div><div class="stat-val" style="color:var(--purple)">${scripts.length}</div><div class="stat-sub">${knowledge.length} articles</div></div>`;
-  const rec=[...devices].sort((a,b)=>b.imagingDate-a.imagingDate).slice(0,6);
+<div class="stat-card blue"><div class="stat-label">Active Devices</div><div class="stat-val" style="color:var(--accent2)">${active.length}</div><div class="stat-sub">${departments.length} departments</div></div>
+<div class="stat-card green"><div class="stat-label">Loaners</div><div class="stat-val" style="color:var(--green)">${l}</div><div class="stat-sub">in circulation</div></div>
+<div class="stat-card yellow"><div class="stat-label">Scripts</div><div class="stat-val" style="color:var(--yellow)">${scripts.length}</div><div class="stat-sub">${knowledge.length} articles</div></div>
+<div class="stat-card purple"><div class="stat-label">Checklists</div><div class="stat-val" style="color:var(--purple)">${checklists.length}</div><div class="stat-sub">${r} retired devices</div></div>`;
+  const rec=[...active].sort((a,b)=>b.imagingDate-a.imagingDate).slice(0,6);
   document.getElementById('dash-recent').innerHTML=rec.length
-    ?`<table><thead><tr><th>Name</th><th>Department</th><th>Tech</th></tr></thead><tbody>${rec.map(d=>`<tr onclick="openDrawer('${d.id}')"><td class="mono" style="color:var(--accent2)">${esc(d.deviceName)}</td><td>${esc(d.department)}${d.subdepartment?` / <span style="color:var(--text3)">${esc(d.subdepartment)}</span>`:''}</td><td>${esc(d.imagingTech)||'—'}</td></tr>`).join('')}</tbody></table>`
-    :'<div style="color:var(--text3);font-size:13px">No devices yet.</div>';
+    ?`<table><thead><tr><th>Name</th><th>Department</th><th>Imaged</th></tr></thead><tbody>${rec.map(d=>`<tr onclick="openDrawer('${d.id}')"><td class="mono" style="color:var(--accent2)">${esc(d.deviceName)}</td><td>${esc(d.department)}</td><td style="color:var(--text3);font-size:12px">${d.imagingDate?new Date(d.imagingDate).toLocaleDateString():'—'}</td></tr>`).join('')}</tbody></table>`
+    :'<div style="color:var(--text3);font-size:13px">No active devices yet.</div>';
   const dc={};
-  devices.forEach(d=>{const k=d.department+(d.subdepartment?' › '+d.subdepartment:'');dc[k]=(dc[k]||0)+1});
+  active.forEach(d=>{const k=d.department+(d.subdepartment?' › '+d.subdepartment:'');dc[k]=(dc[k]||0)+1});
   document.getElementById('dash-depts').innerHTML=Object.entries(dc).slice(0,8).map(([k,v])=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(37,45,61,0.5)"><span style="font-size:13px">${esc(k)}</span><span class="badge bb">${v}</span></div>`).join('')
-    +`<div style="color:var(--text3);font-size:12px;font-family:var(--mono);margin-top:10px">${r} retired device${r!==1?'s':''}</div>`;
+    +`<div style="color:var(--text3);font-size:12px;font-family:var(--mono);margin-top:10px">${r} retired device${r!==1?'s':''} hidden from dashboard</div>`;
 }
 
 function renderDevices(){
@@ -836,26 +850,46 @@ function renderDevices(){
   const fd=document.getElementById('dev-f-dept').value;
   const fs=document.getElementById('dev-f-status').value;
   const ft=document.getElementById('dev-f-type').value;
+  // Repopulate dept filter
   const ds=document.getElementById('dev-f-dept');
   const pv=ds.value;
   ds.innerHTML=`<option value="">All Departments</option>`+departments.map(d=>`<option${d.name===pv?' selected':''}>${esc(d.name)}</option>`).join('');
   ds.value=pv;
-  const filtered=devices.filter(d=>{
+  // Sort arrows
+  ['deviceName','assetTag','department','status','imagingDate'].forEach(f=>{
+    const el=document.getElementById('sa-'+f);
+    if(el)el.textContent=devSortField===f?(devSortAsc?'↑':'↓'):'↕';
+    const th=el?.closest('th');
+    if(th)th.classList.toggle('sorted',devSortField===f);
+  });
+  let filtered=devices.filter(d=>{
     if(fd&&d.department!==fd)return false;
     if(fs&&d.status!==fs)return false;
     if(ft&&d.deviceType!==ft)return false;
     if(q&&![d.deviceName,d.assetTag,d.serviceTag,d.assignedUser,d.department,d.subdepartment,d.status].join(' ').toLowerCase().includes(q))return false;
     return true;
-  }).sort((a,b)=>b.imagingDate-a.imagingDate);
+  });
+  filtered.sort((a,b)=>{
+    let av=a[devSortField]??'',bv=b[devSortField]??'';
+    if(devSortField==='imagingDate'){av=av||0;bv=bv||0;}
+    const cmp=typeof av==='number'?av-bv:String(av).localeCompare(String(bv));
+    return devSortAsc?cmp:-cmp;
+  });
   const tb=document.getElementById('dev-tbody');
   const em=document.getElementById('dev-empty');
   if(!filtered.length){tb.innerHTML='';em.style.display='';return}
   em.style.display='none';
-  const steps=clTemplate||[];
   tb.innerHTML=filtered.map(d=>{
+    const applicable=checklists.filter(cl=>{
+      const deptMatch=cl.department===''||cl.department===d.department;
+      const typeMatch=cl.deviceType===''||cl.deviceType==='All Devices'||cl.deviceType===d.deviceType;
+      return deptMatch&&typeMatch;
+    });
+    const allSteps=applicable.flatMap(cl=>(cl.steps||[]).map(s=>({clId:cl.id,stepId:s.id})));
     const state=d.checklistState||{};
-    const done=steps.filter(s=>state[s.id]?.checked).length;
-    const pct=steps.length?Math.round((done/steps.length)*100):null;
+    const done=allSteps.filter(({clId,stepId})=>state[clId+'::'+stepId]?.checked).length;
+    const pct=allSteps.length?Math.round((done/allSteps.length)*100):null;
+    const dateStr=d.imagingDate?new Date(d.imagingDate).toLocaleDateString():'—';
     return`<tr onclick="openDrawer('${d.id}')">
 <td class="mono" style="color:var(--accent2)">${esc(d.deviceName)}</td>
 <td class="mono">${esc(d.assetTag)}</td>
@@ -864,6 +898,7 @@ function renderDevices(){
 <td style="color:var(--text3)">${esc(d.subdepartment)||'—'}</td>
 <td>${esc(d.assignedUser)||'—'}</td>
 <td><span class="badge ${sb(d.status)}">${esc(d.status)}</span></td>
+<td style="color:var(--text3);font-size:12px;font-family:var(--mono)">${dateStr}</td>
 <td>${pct===null?'<span style="color:var(--text3);font-size:11px">—</span>':pct===100?'<span class="badge bg">✓ Done</span>':`<span class="badge bb">${pct}%</span>`}</td>
 <td onclick="event.stopPropagation()" style="white-space:nowrap">
 <button class="btn btn-secondary btn-xs" onclick="openDeviceModal('${d.id}')">Edit</button>
@@ -875,6 +910,14 @@ function openDeviceModal(id){
   editDevId=id||null;
   const d=id?devices.find(x=>x.id===id):{};
   const hasSubs=d.department&&(departments.find(x=>x.name===d.department)?.subdepts||[]).length>0;
+  // Imaging date default: today for new devices, stored date for existing
+  let dateVal='';
+  if(d.imagingDate){
+    const dt=new Date(d.imagingDate);
+    dateVal=dt.toISOString().split('T')[0];
+  } else {
+    dateVal=todayVal();
+  }
   openModal(id?'Edit Device':'Add Device',`
 <div class="form-row c2">
 <div class="field"><label>Department *</label>
@@ -886,13 +929,16 @@ ${departments.map(dep=>`<option value="${esc(dep.name)}"${dep.name===d.departmen
 <select id="dm-sub" onchange="dmUpdateName()" ${hasSubs?'':'disabled'}>${subOpts(d.department,d.subdeptId)}</select>
 </div>
 </div>
-<div class="form-row c2">
+<div class="form-row c3">
 <div class="field"><label>Device Type *</label>
 <select id="dm-type" onchange="dmUpdateName()">
 <option${(d.deviceType||'Desktop')==='Desktop'?' selected':''}>Desktop</option>
 <option${(d.deviceType||'')==='Laptop'?' selected':''}>Laptop</option>
 <option${(d.deviceType||'')==='Tablet'?' selected':''}>Tablet</option>
 </select></div>
+<div class="field"><label>Asset Tag Letter (not in name)</label>
+<input type="text" id="dm-asset-letter" value="${esc(d.assetLetter||'')}" maxlength="3" placeholder="e.g. A" style="text-transform:uppercase" oninput="this.value=this.value.toUpperCase()">
+</div>
 <div class="field"><label>Asset Tag (numbers only) *</label>
 <input type="text" id="dm-asset" value="${esc(d.assetTag||'')}" oninput="this.value=this.value.replace(/\\D/g,'');dmUpdateName()" placeholder="00123">
 </div>
@@ -918,12 +964,10 @@ ${departments.map(dep=>`<option value="${esc(dep.name)}"${dep.name===d.departmen
 <option${(d.status||'')==='Retired'?' selected':''}>Retired</option>
 </select></div>
 </div>
-<div class="form-row c2">
+<div class="form-row c3">
 <div class="field"><label>Windows Version</label><input type="text" id="dm-win" value="${esc(d.windowsVersion||'')}" placeholder="Windows 11 Pro 23H2"></div>
 <div class="field"><label>Imaging Tech</label><select id="dm-tech">${techOpts(d.imagingTech)}</select></div>
-</div>
-<div class="form-row">
-<div class="toggle-wrap"><label class="toggle"><input type="checkbox" id="dm-bl" ${d.bitlocker?'checked':''}><span class="toggle-slider"></span></label><span style="font-size:13px;color:var(--text2)">BitLocker Confirmed</span></div>
+<div class="field"><label>Imaging Date</label><input type="date" id="dm-imgdate" value="${dateVal}" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:9px 12px;color:var(--text);outline:none;font-size:13px;width:100%"></div>
 </div>`,
 `<button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveDevice()">Save Device</button>`);
   setTimeout(dmUpdateName,10);
@@ -958,11 +1002,14 @@ function saveDevice(){
   const subdept=(departments.find(x=>x.name===dept)?.subdepts||[]).find(x=>x.id===subId);
   const override=document.getElementById('dm-override').checked;
   const name=document.getElementById('dm-name').value;
+  const imgDateStr=document.getElementById('dm-imgdate').value;
+  const imgDate=imgDateStr?new Date(imgDateStr).getTime():Date.now();
   const ex=editDevId?devices.find(x=>x.id===editDevId):{};
   const obj={
     id:editDevId||uid(),
     department:dept,subdeptId:subId||'',subdepartment:subdept?.name||'',
-    assetTag:asset,deviceType:type,
+    assetTag:asset,assetLetter:document.getElementById('dm-asset-letter').value,
+    deviceType:type,
     serviceTag:document.getElementById('dm-service').value,
     deviceName:name||genName(dept,subId,asset,type),
     nameOverride:override,
@@ -971,8 +1018,7 @@ function saveDevice(){
     status:document.getElementById('dm-status').value,
     windowsVersion:document.getElementById('dm-win').value,
     imagingTech:document.getElementById('dm-tech').value,
-    bitlocker:document.getElementById('dm-bl').checked,
-    imagingDate:ex.imagingDate||Date.now(),
+    imagingDate:imgDate,
     noteTimeline:ex.noteTimeline||[],
     checklistState:ex.checklistState||{}
   };
@@ -987,6 +1033,7 @@ function delDevice(id){
   save();renderDevices();toast('Device deleted');
 }
 
+// ---- NAMING RULES ----
 function renderNaming(){
   const el=document.getElementById('naming-list');
   if(!departments.length){el.innerHTML='<div class="empty">No departments yet. Add one above.</div>';return}
@@ -1008,8 +1055,7 @@ function renderNaming(){
 <button class="btn btn-danger btn-xs" onclick="delDept('${esc(d.id)}')">Del</button>
 </div>
 </div>
-${subs.length?`
-<div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">
+${subs.length?`<div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">
 <div style="font-size:11px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">Sub-Departments</div>
 ${subs.map(s=>`<div class="subdept-row">
 <span style="color:var(--text3);font-family:var(--mono);font-size:12px;width:16px;flex-shrink:0">↳</span>
@@ -1022,7 +1068,7 @@ ${subs.map(s=>`<div class="subdept-row">
 </div>`:''}
 <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(37,45,61,0.5);display:flex;gap:6px;align-items:center;flex-wrap:wrap">
 <input type="text" id="sn-${esc(d.id)}" placeholder="Sub-dept name (e.g. Appraisers)" style="flex:1;min-width:160px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:7px 11px;color:var(--text);outline:none;font-size:13px" onkeydown="if(event.key==='Enter')addSubdept('${esc(d.id)}')">
-<input type="text" id="sp-${esc(d.id)}" placeholder="Extra letters e.g. AP" maxlength="6" title="These letters are appended to the root prefix. Assessors(A) + AP = AAP" style="width:130px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:7px 11px;color:var(--accent2);outline:none;font-size:13px;font-family:var(--mono);font-weight:700;text-transform:uppercase" oninput="this.value=this.value.toUpperCase();document.getElementById('sp-prev-${esc(d.id)}').textContent=this.value?'→ '+'${esc(d.prefix)}'+this.value:''">
+<input type="text" id="sp-${esc(d.id)}" placeholder="Extra letters e.g. AP" maxlength="6" style="width:130px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:7px 11px;color:var(--accent2);outline:none;font-size:13px;font-family:var(--mono);font-weight:700;text-transform:uppercase" oninput="this.value=this.value.toUpperCase();document.getElementById('sp-prev-${esc(d.id)}').textContent=this.value?'→ '+'${esc(d.prefix)}'+this.value:''">
 <span id="sp-prev-${esc(d.id)}" style="font-family:var(--mono);font-size:12px;color:var(--green);white-space:nowrap"></span>
 <button class="btn btn-green btn-xs" onclick="addSubdept('${esc(d.id)}')">+ Add Sub-Dept</button>
 </div>
@@ -1041,8 +1087,7 @@ function openNamingModal(id){
 <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-top:4px">
 <div style="font-size:11px;color:var(--text3);margin-bottom:6px;font-family:var(--mono);text-transform:uppercase;letter-spacing:0.08em">Live Preview — asset 00123, Laptop</div>
 <div id="nm-preview" style="font-family:var(--mono);font-size:20px;color:var(--accent2);font-weight:700"></div>
-</div>
-<div style="margin-top:12px;font-size:12px;color:var(--text3);line-height:1.6">Sub-departments are added from the Naming Rules list after saving this department.</div>`,
+</div>`,
 `<button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveDept()">Save Department</button>`);
   setTimeout(nmPreview,0);
 }
@@ -1090,6 +1135,122 @@ function delSubdept(deptId,subId){
   save();renderNaming();toast('Sub-dept removed');
 }
 
+// ---- CHECKLISTS TAB ----
+function renderChecklists(){
+  const fd=document.getElementById('cl-f-dept').value;
+  const ft=document.getElementById('cl-f-type').value;
+  // Populate dept filter
+  const ds=document.getElementById('cl-f-dept');
+  const pv=ds.value;
+  ds.innerHTML=`<option value="">All Departments</option>`+departments.map(d=>`<option${d.name===pv?' selected':''}>${esc(d.name)}</option>`).join('');
+  ds.value=pv;
+  const filtered=checklists.filter(cl=>{
+    if(fd&&cl.department!==fd&&cl.department!=='')return false;
+    if(ft&&cl.deviceType!==ft&&cl.deviceType!=='All Devices'&&cl.deviceType!=='')return false;
+    return true;
+  });
+  const el=document.getElementById('checklists-list');
+  if(!filtered.length){el.innerHTML='<div class="empty">No checklists yet. Create one above.</div>';return}
+  el.innerHTML=filtered.map(cl=>{
+    const steps=cl.steps||[];
+    return`<div class="cl-section" style="margin-bottom:12px">
+<div class="cl-section-hdr">
+<div>
+<div class="cl-section-title">${esc(cl.name)}</div>
+<div style="font-size:11px;color:var(--text3);margin-top:2px;font-family:var(--mono)">${cl.department||'All Departments'} · ${cl.deviceType||'All Device Types'} · ${steps.length} step${steps.length!==1?'s':''}</div>
+</div>
+<div style="display:flex;gap:6px">
+<button class="btn btn-secondary btn-xs" onclick="openChecklistModal('${cl.id}')">Edit</button>
+<button class="btn btn-danger btn-xs" onclick="delChecklist('${cl.id}')">Del</button>
+</div>
+</div>
+${steps.length?`<div>${steps.map((s,i)=>`<div class="cl-item" style="cursor:default">
+<span style="font-family:var(--mono);font-size:11px;color:var(--text3);width:20px;flex-shrink:0">${i+1}.</span>
+<span class="cl-label">${esc(s.label)}</span>
+</div>`).join('')}</div>`:`<div style="padding:12px 16px;color:var(--text3);font-size:13px">No steps yet — click Edit to add steps.</div>`}
+</div>`;
+  }).join('');
+}
+
+function openChecklistModal(id){
+  editClId=id||null;
+  const cl=id?checklists.find(x=>x.id===id):{};
+  window._clSteps=id?JSON.parse(JSON.stringify(cl.steps||[])):[];
+  const deptOpts=`<option value="">All Departments</option>`+departments.map(d=>`<option value="${esc(d.name)}"${(cl.department||'')=== d.name?' selected':''}>${esc(d.name)}</option>`).join('');
+  openModal(id?'Edit Checklist':'New Checklist',`
+<div class="form-row"><div class="field"><label>Checklist Name *</label><input type="text" id="clm-name" value="${esc(cl.name||'')}" placeholder="e.g. Imaging Setup — Finance Laptops"></div></div>
+<div class="form-row c2">
+<div class="field"><label>Department</label><select id="clm-dept">${deptOpts}</select></div>
+<div class="field"><label>Device Type</label><select id="clm-type">
+<option value="All Devices"${(cl.deviceType||'All Devices')==='All Devices'?' selected':''}>All Devices</option>
+<option${(cl.deviceType||'')==='Desktop'?' selected':''}>Desktop</option>
+<option${(cl.deviceType||'')==='Laptop'?' selected':''}>Laptop</option>
+<option${(cl.deviceType||'')==='Tablet'?' selected':''}>Tablet</option>
+</select></div>
+</div>
+<div style="margin-top:8px">
+<div style="font-size:12px;font-weight:500;color:var(--text2);margin-bottom:8px">Checklist Steps</div>
+<div id="clm-steps-list" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:10px;min-height:40px;overflow:hidden">
+${window._clSteps.length?window._clSteps.map((s,i)=>`<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid rgba(37,45,61,0.5)">
+<span style="font-family:var(--mono);font-size:11px;color:var(--text3);width:20px">${i+1}.</span>
+<span style="flex:1;font-size:13px">${esc(s.label)}</span>
+<button class="btn btn-danger btn-xs" onclick="clmRemoveStep('${s.id}')">×</button>
+</div>`).join(''):'<div style="padding:12px;color:var(--text3);font-size:13px">No steps yet.</div>'}
+</div>
+<div style="display:flex;gap:8px">
+<input type="text" id="clm-new-step" placeholder="Add step (e.g. Domain join confirmed)" style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:8px 12px;color:var(--text);outline:none" onkeydown="if(event.key==='Enter'){event.preventDefault();clmAddStep()}">
+<button class="btn btn-green btn-sm" onclick="clmAddStep()">+ Add Step</button>
+</div>
+</div>`,
+`<button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveChecklist()">Save Checklist</button>`);
+}
+
+function clmAddStep(){
+  const inp=document.getElementById('clm-new-step');
+  const label=inp?.value.trim();
+  if(!label)return;
+  window._clSteps.push({id:uid(),label});
+  inp.value='';
+  clmRefreshSteps();
+}
+
+function clmRemoveStep(id){
+  window._clSteps=window._clSteps.filter(s=>s.id!==id);
+  clmRefreshSteps();
+}
+
+function clmRefreshSteps(){
+  const el=document.getElementById('clm-steps-list');
+  if(!el)return;
+  el.innerHTML=window._clSteps.length?window._clSteps.map((s,i)=>`<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid rgba(37,45,61,0.5)">
+<span style="font-family:var(--mono);font-size:11px;color:var(--text3);width:20px">${i+1}.</span>
+<span style="flex:1;font-size:13px">${esc(s.label)}</span>
+<button class="btn btn-danger btn-xs" onclick="clmRemoveStep('${s.id}')">×</button>
+</div>`).join(''):'<div style="padding:12px;color:var(--text3);font-size:13px">No steps yet.</div>';
+}
+
+function saveChecklist(){
+  const name=document.getElementById('clm-name').value.trim();
+  if(!name){toast('Name required','err');return}
+  const obj={
+    id:editClId||uid(),
+    name,
+    department:document.getElementById('clm-dept').value,
+    deviceType:document.getElementById('clm-type').value,
+    steps:window._clSteps||[]
+  };
+  if(editClId){const i=checklists.findIndex(x=>x.id===editClId);if(i>=0)checklists[i]=obj;}
+  else checklists.push(obj);
+  save();closeModal();renderChecklists();toast('Checklist saved');
+}
+
+function delChecklist(id){
+  if(!confirm('Delete this checklist?'))return;
+  checklists=checklists.filter(x=>x.id!==id);
+  save();renderChecklists();toast('Deleted');
+}
+
+// ---- BULK IMAGING ----
 function renderBulk(){
   const ds=document.getElementById('bulk-dept');
   const pv=ds.value;
@@ -1099,6 +1260,9 @@ function renderBulk(){
   const pt=ts.value;
   ts.innerHTML=`<option value="">-- Select --</option>`+techs.map(t=>`<option${t.name===pt?' selected':''}>${esc(t.name)}</option>`).join('');
   ts.value=pt;
+  // Set default date to today if empty
+  const di=document.getElementById('bulk-date');
+  if(!di.value)di.value=todayVal();
   if(pv)bulkDeptChange();
   renderBulkRows();
 }
@@ -1153,11 +1317,7 @@ function bInput(i,inp){
 function bKey(e,i,f){
   if(e.key==='Enter'){
     if(f==='user')saveBulkRow(i);
-    else{
-      const nf={asset:'st',st:'user'}[f];
-      const row=document.querySelectorAll('#bulk-grid .bulk-row:not(.hdr)')[i];
-      if(row)row.querySelector(`input[data-f="${nf}"]`)?.focus();
-    }
+    else{const nf={asset:'st',st:'user'}[f];const row=document.querySelectorAll('#bulk-grid .bulk-row:not(.hdr)')[i];if(row)row.querySelector(`input[data-f="${nf}"]`)?.focus()}
   }
 }
 
@@ -1168,15 +1328,17 @@ function saveBulkRow(i){
   const type=document.getElementById('bulk-type').value;
   const tech=document.getElementById('bulk-tech').value;
   const loc=document.getElementById('bulk-loc').value;
+  const dateStr=document.getElementById('bulk-date').value;
   if(!dept||!type){toast('Set department and device type first','err');return}
   if(!row.asset){toast('Asset tag required','err');return}
   const subdept=(departments.find(x=>x.name===dept)?.subdepts||[]).find(x=>x.id===subId);
   const name=bulkName(row.asset);
+  const imgDate=dateStr?new Date(dateStr).getTime():Date.now();
   devices.unshift({
     id:uid(),department:dept,subdeptId:subId||'',subdepartment:subdept?.name||'',
-    assetTag:row.asset,deviceType:type,serviceTag:row.st||'',deviceName:name,
+    assetTag:row.asset,assetLetter:'',deviceType:type,serviceTag:row.st||'',deviceName:name,
     assignedUser:row.user||'',location:loc,status:'Active',imagingTech:tech,
-    imagingDate:Date.now(),bitlocker:false,noteTimeline:[],checklistState:{}
+    imagingDate:imgDate,noteTimeline:[],checklistState:{}
   });
   save();
   bulkRows[i].locked=true;
@@ -1210,16 +1372,13 @@ function bulkAddTech(){
   const name=inp?.value.trim();
   if(!name){toast('Enter a tech name','err');return}
   if(techs.find(t=>t.name===name)){toast('Tech already exists','err');return}
-  techs.push({id:uid(),name});
-  save();
+  techs.push({id:uid(),name});save();
   const sel=document.getElementById('bulk-tech');
-  const opt=document.createElement('option');
-  opt.value=name;opt.textContent=name;opt.selected=true;
-  sel.appendChild(opt);
-  inp.value='';
-  toast(`Tech "${name}" added`);
+  const opt=document.createElement('option');opt.value=name;opt.textContent=name;opt.selected=true;sel.appendChild(opt);
+  inp.value='';toast(`Tech "${name}" added`);
 }
 
+// ---- SCRIPTS ----
 function renderScripts(){
   const q=(document.getElementById('script-search').value||'').toLowerCase();
   const cat=document.getElementById('script-cat').value;
@@ -1286,34 +1445,61 @@ function saveScript(){
 function delScript(id){if(!confirm('Delete?'))return;scripts=scripts.filter(x=>x.id!==id);save();renderScripts();toast('Deleted')}
 function togglePin(id){const s=scripts.find(x=>x.id===id);if(s)s.pinned=!s.pinned;save();renderScripts()}
 
+// ---- KNOWLEDGE BASE ----
 function renderKb(){
   const q=(document.getElementById('kb-search').value||'').toLowerCase();
-  const list=[...knowledge].filter(k=>!q||[k.title,k.body,...(k.tags||[])].join(' ').toLowerCase().includes(q)).sort((a,b)=>b.dateAdded-a.dateAdded);
+  const list=[...knowledge].filter(k=>!q||[k.title,k.body,...(k.tags||[]),...(k.links||[]).map(l=>l.label+' '+l.url)].join(' ').toLowerCase().includes(q)).sort((a,b)=>b.dateAdded-a.dateAdded);
   const el=document.getElementById('kb-list');
   if(!list.length){el.innerHTML='<div class="empty">No articles found.</div>';return}
   const hl=str=>q?esc(str).replace(new RegExp(esc(q).replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi'),m=>`<span class="hl">${m}</span>`):esc(str);
-  el.innerHTML=list.map(k=>`<div class="kb-card" onclick="this.querySelector('.kb-body').classList.toggle('expanded')">
+  el.innerHTML=list.map(k=>`<div class="kb-card">
 <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
 <div style="flex:1">
-<div style="font-weight:600;font-size:14px;margin-bottom:4px">${hl(k.title)}</div>
+<div style="font-weight:700;font-size:15px;margin-bottom:3px;cursor:pointer;color:var(--accent2)" onclick="viewKbArticle('${k.id}')">${hl(k.title)}</div>
 <div style="font-size:11px;color:var(--text3);font-family:var(--mono);margin-bottom:6px">${new Date(k.dateAdded).toLocaleDateString()}</div>
-<div class="kb-body">${hl(k.body)}</div>
+<div class="kb-body" style="max-height:60px;overflow:hidden;mask-image:linear-gradient(to bottom,black 40%,transparent)">${hl(k.body)}</div>
+${(k.links||[]).length?`<div class="kb-links">${(k.links||[]).map(l=>`<a class="kb-link" href="${esc(l.url)}" target="_blank" rel="noopener">🔗 ${esc(l.label||l.url)}</a>`).join('')}</div>`:''}
 ${(k.tags||[]).length?`<div style="margin-top:8px">${(k.tags||[]).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div>`:''}
 </div>
 <div style="display:flex;gap:6px;flex-shrink:0">
-<button class="btn btn-secondary btn-xs" onclick="event.stopPropagation();openKbModal('${k.id}')">Edit</button>
-<button class="btn btn-danger btn-xs" onclick="event.stopPropagation();delKb('${k.id}')">Del</button>
+<button class="btn btn-secondary btn-xs" onclick="viewKbArticle('${k.id}')">View</button>
+<button class="btn btn-secondary btn-xs" onclick="openKbModal('${k.id}')">Edit</button>
+<button class="btn btn-danger btn-xs" onclick="delKb('${k.id}')">Del</button>
 </div>
 </div></div>`).join('');
+}
+
+function viewKbArticle(id){
+  const k=knowledge.find(x=>x.id===id);
+  if(!k)return;
+  openModal(k.title,`<div class="kb-view">
+<div class="kb-view-meta">${new Date(k.dateAdded).toLocaleDateString()} ${(k.tags||[]).length?'· '+k.tags.join(', '):''}</div>
+<div class="kb-view-body">${esc(k.body)}</div>
+${(k.links||[]).length?`<div class="kb-view-links">
+<div class="kb-view-links-title">Links</div>
+<div style="display:flex;flex-wrap:wrap;gap:8px">${(k.links||[]).map(l=>`<a class="kb-link" href="${esc(l.url)}" target="_blank" rel="noopener" style="font-size:13px;padding:5px 14px">🔗 ${esc(l.label||l.url)}</a>`).join('')}</div>
+</div>`:''}
+</div>`,
+`<button class="btn btn-secondary" onclick="closeModal()">Close</button><button class="btn btn-primary" onclick="closeModal();openKbModal('${k.id}')">Edit</button>`);
 }
 
 function openKbModal(id){
   editKbId=id||null;
   const k=id?knowledge.find(x=>x.id===id):{};
   window._ktags=id?[...(k.tags||[])]:[];
+  window._klinks=id?JSON.parse(JSON.stringify(k.links||[])):[];
   openModal(id?'Edit Article':'Add Article',`
 <div class="form-row"><div class="field"><label>Title *</label><input type="text" id="km-title" value="${esc(k.title||'')}" placeholder="Article title"></div></div>
 <div class="form-row"><div class="field"><label>Body *</label><textarea id="km-body" style="min-height:180px">${esc(k.body||'')}</textarea></div></div>
+<div style="margin-bottom:12px">
+<div style="font-size:12px;font-weight:500;color:var(--text2);margin-bottom:8px">Links</div>
+<div id="klinks-list" style="margin-bottom:8px">${window._klinks.map((l,i)=>`<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+<input type="text" value="${esc(l.label)}" placeholder="Label" data-li="${i}" data-lf="label" oninput="kLinkInput(this)" style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:7px 10px;color:var(--text);outline:none;font-size:13px">
+<input type="text" value="${esc(l.url)}" placeholder="https://…" data-li="${i}" data-lf="url" oninput="kLinkInput(this)" style="flex:2;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:7px 10px;color:var(--text);outline:none;font-size:13px">
+<button class="btn btn-danger btn-xs" onclick="kLinkRemove(${i})">×</button>
+</div>`).join('')}</div>
+<button class="btn btn-secondary btn-sm" onclick="kLinkAdd()">+ Add Link</button>
+</div>
 <div class="field"><label>Tags (press Enter)</label>
 <div class="tags-wrap" onclick="document.getElementById('ktag-inp').focus()">
 <span id="ktag-disp">${window._ktags.map(t=>`<span class="tag">${esc(t)}<span class="tag-x" onclick="rmKtag('${esc(t)}')">×</span></span>`).join('')}</span>
@@ -1321,6 +1507,21 @@ function openKbModal(id){
 </div></div>`,
 `<button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveKb()">Save Article</button>`);
 }
+
+function kLinkAdd(){
+  window._klinks.push({label:'',url:''});
+  const el=document.getElementById('klinks-list');
+  const i=window._klinks.length-1;
+  const div=document.createElement('div');
+  div.style.cssText='display:flex;align-items:center;gap:6px;margin-bottom:6px';
+  div.innerHTML=`<input type="text" value="" placeholder="Label" data-li="${i}" data-lf="label" oninput="kLinkInput(this)" style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:7px 10px;color:var(--text);outline:none;font-size:13px">
+<input type="text" value="" placeholder="https://…" data-li="${i}" data-lf="url" oninput="kLinkInput(this)" style="flex:2;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:7px 10px;color:var(--text);outline:none;font-size:13px">
+<button class="btn btn-danger btn-xs" onclick="kLinkRemove(${i})">×</button>`;
+  el.appendChild(div);
+  div.querySelector('input').focus();
+}
+function kLinkInput(inp){const i=parseInt(inp.dataset.li);const f=inp.dataset.lf;if(window._klinks[i])window._klinks[i][f]=inp.value}
+function kLinkRemove(i){window._klinks.splice(i,1);const el=document.getElementById('klinks-list');if(el){const rows=el.querySelectorAll('div');if(rows[i])rows[i].remove();}}
 
 function addKtag(){const v=document.getElementById('ktag-inp').value.trim();if(!v)return;if(!window._ktags.includes(v)){window._ktags.push(v);document.getElementById('ktag-disp').innerHTML=window._ktags.map(t=>`<span class="tag">${esc(t)}<span class="tag-x" onclick="rmKtag('${esc(t)}')">×</span></span>`).join('')}document.getElementById('ktag-inp').value=''}
 function rmKtag(t){window._ktags=window._ktags.filter(x=>x!==t);document.getElementById('ktag-disp').innerHTML=window._ktags.map(t=>`<span class="tag">${esc(t)}<span class="tag-x" onclick="rmKtag('${esc(t)}')">×</span></span>`).join('')}
@@ -1330,133 +1531,32 @@ function saveKb(){
   const body=document.getElementById('km-body').value.trim();
   if(!title||!body){toast('Title and body required','err');return}
   const ex=editKbId?knowledge.find(x=>x.id===editKbId):null;
-  const obj={id:editKbId||uid(),title,body,tags:window._ktags||[],dateAdded:ex?.dateAdded||Date.now()};
+  const links=(window._klinks||[]).filter(l=>l.url.trim());
+  const obj={id:editKbId||uid(),title,body,tags:window._ktags||[],links,dateAdded:ex?.dateAdded||Date.now()};
   if(editKbId){const i=knowledge.findIndex(x=>x.id===editKbId);if(i>=0)knowledge[i]=obj;}else knowledge.unshift(obj);
   save();closeModal();renderKb();toast('Article saved');
 }
 function delKb(id){if(!confirm('Delete?'))return;knowledge=knowledge.filter(x=>x.id!==id);save();renderKb();toast('Deleted')}
 
+// ---- QUICK TOOLS ----
 function renderTools(){
   document.getElementById('tool-ou').innerHTML=`<option value="">-- Select --</option>`+departments.map(d=>`<option value="${esc(d.name)}">${esc(d.name)}</option>`).join('');
   document.getElementById('finder-dept').innerHTML=`<option value="">All</option>`+departments.map(d=>`<option value="${esc(d.name)}">${esc(d.name)}</option>`).join('');
   updateRename();updateDomain();updateGP();updateADUser();updateSpooler();updateDNS();updateCompInfo();updateLoggedIn();updateDrive();updateDisk();updateRDP();updateADDesc();runFinder();
 }
 
-function updateRename(){
-  const n=document.getElementById('tool-rename').value||'DEVICE_NAME';
-  document.getElementById('rename-out').textContent=`Rename-Computer -NewName "${n}" -Restart`;
-}
-
-function updateDomain(){
-  const domain=document.getElementById('tool-domain').value||'county.local';
-  const dept=document.getElementById('tool-ou').value||'DEPARTMENT';
-  const dc=domain.split('.').map(p=>`DC=${p}`).join(',');
-  document.getElementById('domain-out').textContent=`Add-Computer -DomainName "${domain}" -OUPath "OU=${dept},OU=Departments,${dc}"`;
-}
-
-function updateGP(){
-  const target=document.getElementById('gp-target').value;
-  const rf=document.getElementById('gp-remote-field');
-  rf.style.display=target==='remote'?'':'none';
-  const computer=document.getElementById('gp-computer').value.trim();
-  let script;
-  if(target==='remote'&&computer){
-    script=`Invoke-Command -ComputerName "${computer}" -ScriptBlock { gpupdate /force }`;
-  }else{
-    script=`gpupdate /force`;
-  }
-  document.getElementById('gp-out').textContent=script;
-}
-
-function updateADUser(){
-  const user=document.getElementById('ad-user').value.trim()||'USERNAME';
-  const dc=document.getElementById('ad-dc').value.trim();
-  const props=`Name,SamAccountName,EmailAddress,Title,Department,Office,Enabled,LockedOut,LastLogonDate,PasswordLastSet,PasswordExpired`;
-  let script=`Get-ADUser -Identity "${user}" -Properties * | Select-Object ${props} | Format-List`;
-  if(dc)script=`Get-ADUser -Identity "${user}" -Server "${dc}" -Properties * | Select-Object ${props} | Format-List`;
-  document.getElementById('ad-user-out').textContent=script;
-}
-
-function updateSpooler(){
-  const target=document.getElementById('spool-target').value;
-  const rf=document.getElementById('spool-remote-field');
-  rf.style.display=target==='remote'?'':'none';
-  const computer=document.getElementById('spool-computer').value.trim();
-  const block=`Stop-Service -Name Spooler -Force
-Remove-Item "$env:SystemRoot\\System32\\spool\\PRINTERS\\*" -Force -Recurse -ErrorAction SilentlyContinue
-Start-Service -Name Spooler
-Write-Host "Print spooler cleared and restarted." -ForegroundColor Green`;
-  let script;
-  if(target==='remote'&&computer){
-    script=`Invoke-Command -ComputerName "${computer}" -ScriptBlock {\n${block.split('\n').map(l=>'  '+l).join('\n')}\n}`;
-  }else{
-    script=block;
-  }
-  document.getElementById('spool-out').textContent=script;
-}
-
-function updateDNS(){
-  const target=document.getElementById('dns-target').value;
-  const rf=document.getElementById('dns-remote-field');
-  rf.style.display=target==='remote'?'':'none';
-  const computer=document.getElementById('dns-computer').value.trim();
-  const block=`ipconfig /flushdns
-ipconfig /release
-ipconfig /renew
-netsh winsock reset
-Write-Host "DNS flushed and network reset. Reboot recommended." -ForegroundColor Green`;
-  let script;
-  if(target==='remote'&&computer){
-    script=`Invoke-Command -ComputerName "${computer}" -ScriptBlock {\n${block.split('\n').map(l=>'  '+l).join('\n')}\n}`;
-  }else{
-    script=block;
-  }
-  document.getElementById('dns-out').textContent=script;
-}
-
-function updateCompInfo(){
-  const c=document.getElementById('compinfo-computer').value.trim();
-  const props=`CsName,WindowsProductName,WindowsVersion,OsArchitecture,CsTotalPhysicalMemory,CsProcessors,BiosSerialNumber,OsLastBootUpTime`;
-  let script;
-  if(c){
-    script=`Invoke-Command -ComputerName "${c}" -ScriptBlock {\n  Get-ComputerInfo | Select-Object ${props} | Format-List\n}`;
-  }else{
-    script=`Get-ComputerInfo | Select-Object ${props} | Format-List`;
-  }
-  document.getElementById('compinfo-out').textContent=script;
-}
-
-function updateLoggedIn(){
-  const c=document.getElementById('loggedin-computer').value.trim()||'COMPUTERNAME';
-  document.getElementById('loggedin-out').textContent=`(Get-WmiObject -Class Win32_ComputerSystem -ComputerName "${c}").UserName`;
-}
-
-function updateDrive(){
-  const letter=document.getElementById('drive-letter').value||'G';
-  const path=document.getElementById('drive-path').value.trim()||'\\\\server\\share';
-  const persist=document.getElementById('drive-persist').checked;
-  document.getElementById('drive-out').textContent=`New-PSDrive -Name "${letter}" -PSProvider FileSystem -Root "${path}"${persist?' -Persist':''}\n# Or using net use:\nnet use ${letter}: "${path}"${persist?' /persistent:yes':''}`;
-}
-
-function updateDisk(){
-  const c=document.getElementById('disk-computer').value.trim();
-  const block=`Get-PSDrive -PSProvider FileSystem | Select-Object Name,@{N='Used(GB)';E={[math]::Round($_.Used/1GB,1)}},@{N='Free(GB)';E={[math]::Round($_.Free/1GB,1)}},@{N='Total(GB)';E={[math]::Round(($_.Used+$_.Free)/1GB,1)}} | Format-Table -AutoSize`;
-  document.getElementById('disk-out').textContent=c?`Invoke-Command -ComputerName "${c}" -ScriptBlock {\n  ${block}\n}`:block;
-}
-
-function updateRDP(){
-  const c=document.getElementById('rdp-computer').value.trim();
-  const block=`Set-ItemProperty -Path 'HKLM:\\System\\CurrentControlSet\\Control\\Terminal Server' -Name "fDenyTSConnections" -Value 0
-Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
-Write-Host "RDP enabled." -ForegroundColor Green`;
-  document.getElementById('rdp-out').textContent=c?`Invoke-Command -ComputerName "${c}" -ScriptBlock {\n${block.split('\n').map(l=>'  '+l).join('\n')}\n}`:block;
-}
-
-function updateADDesc(){
-  const computer=document.getElementById('addesc-computer').value.trim()||'COMPUTERNAME';
-  const desc=document.getElementById('addesc-text').value.trim()||'Description here';
-  document.getElementById('addesc-out').textContent=`Set-ADComputer -Identity "${computer}" -Description "${desc}"`;
-}
+function updateRename(){const n=document.getElementById('tool-rename').value||'DEVICE_NAME';document.getElementById('rename-out').textContent=`Rename-Computer -NewName "${n}" -Restart`}
+function updateDomain(){const domain=document.getElementById('tool-domain').value||'county.local';const dept=document.getElementById('tool-ou').value||'DEPARTMENT';const dc=domain.split('.').map(p=>`DC=${p}`).join(',');document.getElementById('domain-out').textContent=`Add-Computer -DomainName "${domain}" -OUPath "OU=${dept},OU=Departments,${dc}"`}
+function updateGP(){const target=document.getElementById('gp-target').value;const rf=document.getElementById('gp-remote-field');rf.style.display=target==='remote'?'':'none';const computer=document.getElementById('gp-computer').value.trim();document.getElementById('gp-out').textContent=target==='remote'&&computer?`Invoke-Command -ComputerName "${computer}" -ScriptBlock { gpupdate /force }`:`gpupdate /force`}
+function updateADUser(){const user=document.getElementById('ad-user').value.trim()||'USERNAME';const dc=document.getElementById('ad-dc').value.trim();const props=`Name,SamAccountName,EmailAddress,Title,Department,Office,Enabled,LockedOut,LastLogonDate,PasswordLastSet,PasswordExpired`;let script=`Get-ADUser -Identity "${user}" -Properties * | Select-Object ${props} | Format-List`;if(dc)script=`Get-ADUser -Identity "${user}" -Server "${dc}" -Properties * | Select-Object ${props} | Format-List`;document.getElementById('ad-user-out').textContent=script}
+function updateSpooler(){const target=document.getElementById('spool-target').value;const rf=document.getElementById('spool-remote-field');rf.style.display=target==='remote'?'':'none';const computer=document.getElementById('spool-computer').value.trim();const block=`Stop-Service -Name Spooler -Force\nRemove-Item "$env:SystemRoot\\System32\\spool\\PRINTERS\\*" -Force -Recurse -ErrorAction SilentlyContinue\nStart-Service -Name Spooler\nWrite-Host "Print spooler cleared and restarted." -ForegroundColor Green`;document.getElementById('spool-out').textContent=target==='remote'&&computer?`Invoke-Command -ComputerName "${computer}" -ScriptBlock {\n${block.split('\n').map(l=>'  '+l).join('\n')}\n}`:block}
+function updateDNS(){const target=document.getElementById('dns-target').value;const rf=document.getElementById('dns-remote-field');rf.style.display=target==='remote'?'':'none';const computer=document.getElementById('dns-computer').value.trim();const block=`ipconfig /flushdns\nipconfig /release\nipconfig /renew\nnetsh winsock reset\nWrite-Host "DNS flushed and network reset. Reboot recommended." -ForegroundColor Green`;document.getElementById('dns-out').textContent=target==='remote'&&computer?`Invoke-Command -ComputerName "${computer}" -ScriptBlock {\n${block.split('\n').map(l=>'  '+l).join('\n')}\n}`:block}
+function updateCompInfo(){const c=document.getElementById('compinfo-computer').value.trim();const props=`CsName,WindowsProductName,WindowsVersion,OsArchitecture,CsTotalPhysicalMemory,CsProcessors,BiosSerialNumber,OsLastBootUpTime`;document.getElementById('compinfo-out').textContent=c?`Invoke-Command -ComputerName "${c}" -ScriptBlock {\n  Get-ComputerInfo | Select-Object ${props} | Format-List\n}`:`Get-ComputerInfo | Select-Object ${props} | Format-List`}
+function updateLoggedIn(){const c=document.getElementById('loggedin-computer').value.trim()||'COMPUTERNAME';document.getElementById('loggedin-out').textContent=`(Get-WmiObject -Class Win32_ComputerSystem -ComputerName "${c}").UserName`}
+function updateDrive(){const letter=document.getElementById('drive-letter').value||'G';const path=document.getElementById('drive-path').value.trim()||'\\\\server\\share';const persist=document.getElementById('drive-persist').checked;document.getElementById('drive-out').textContent=`New-PSDrive -Name "${letter}" -PSProvider FileSystem -Root "${path}"${persist?' -Persist':''}\n# Or using net use:\nnet use ${letter}: "${path}"${persist?' /persistent:yes':''}`}
+function updateDisk(){const c=document.getElementById('disk-computer').value.trim();const block=`Get-PSDrive -PSProvider FileSystem | Select-Object Name,@{N='Used(GB)';E={[math]::Round($_.Used/1GB,1)}},@{N='Free(GB)';E={[math]::Round($_.Free/1GB,1)}},@{N='Total(GB)';E={[math]::Round(($_.Used+$_.Free)/1GB,1)}} | Format-Table -AutoSize`;document.getElementById('disk-out').textContent=c?`Invoke-Command -ComputerName "${c}" -ScriptBlock {\n  ${block}\n}`:block}
+function updateRDP(){const c=document.getElementById('rdp-computer').value.trim();const block=`Set-ItemProperty -Path 'HKLM:\\System\\CurrentControlSet\\Control\\Terminal Server' -Name "fDenyTSConnections" -Value 0\nEnable-NetFirewallRule -DisplayGroup "Remote Desktop"\nWrite-Host "RDP enabled." -ForegroundColor Green`;document.getElementById('rdp-out').textContent=c?`Invoke-Command -ComputerName "${c}" -ScriptBlock {\n${block.split('\n').map(l=>'  '+l).join('\n')}\n}`:block}
+function updateADDesc(){const computer=document.getElementById('addesc-computer').value.trim()||'COMPUTERNAME';const desc=document.getElementById('addesc-text').value.trim()||'Description here';document.getElementById('addesc-out').textContent=`Set-ADComputer -Identity "${computer}" -Description "${desc}"`}
 
 function runFinder(){
   const dept=document.getElementById('finder-dept')?.value;
@@ -1474,12 +1574,13 @@ function runFinder(){
   });
   const el=document.getElementById('finder-results');
   if(!results.length){el.innerHTML='<div style="color:var(--text3);font-size:13px;padding:12px 0">No devices match.</div>';return}
-  el.innerHTML=`<table style="margin-top:12px"><thead><tr><th>Name</th><th>Type</th><th>Status</th><th>Dept</th></tr></thead><tbody>
-${results.slice(0,25).map(d=>`<tr onclick="openDrawer('${d.id}')"><td class="mono" style="color:var(--accent2)">${esc(d.deviceName)}</td><td>${esc(d.deviceType)}</td><td><span class="badge ${sb(d.status)}">${esc(d.status)}</span></td><td>${esc(d.department)}${d.subdepartment?' / '+esc(d.subdepartment):''}</td></tr>`).join('')}
+  el.innerHTML=`<table style="margin-top:12px"><thead><tr><th>Name</th><th>Type</th><th>Status</th><th>Dept</th><th>Imaged</th></tr></thead><tbody>
+${results.slice(0,25).map(d=>`<tr onclick="openDrawer('${d.id}')"><td class="mono" style="color:var(--accent2)">${esc(d.deviceName)}</td><td>${esc(d.deviceType)}</td><td><span class="badge ${sb(d.status)}">${esc(d.status)}</span></td><td>${esc(d.department)}</td><td style="font-size:12px;color:var(--text3)">${d.imagingDate?new Date(d.imagingDate).toLocaleDateString():'—'}</td></tr>`).join('')}
 </tbody></table>${results.length>25?`<div style="color:var(--text3);font-size:12px;margin-top:8px">…and ${results.length-25} more</div>`:''}`;
 }
 
-function renderExports(){renderTechs();renderClTemplate()}
+// ---- EXPORTS ----
+function renderExports(){renderTechs()}
 
 function renderTechs(){
   const el=document.getElementById('techs-list');
@@ -1499,34 +1600,16 @@ function addTech(){
 }
 function delTech(id){techs=techs.filter(x=>x.id!==id);save();renderTechs();toast('Removed')}
 
-function renderClTemplate(){
-  const el=document.getElementById('cl-template-list');
-  if(!clTemplate.length){el.innerHTML='<div style="color:var(--text3);font-size:13px;margin-bottom:8px">No steps yet.</div>';return}
-  el.innerHTML=clTemplate.map(s=>`<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid rgba(37,45,61,0.5)">
-<span style="flex:1;font-size:13px">${esc(s.label)}</span>
-<button class="btn btn-danger btn-xs" onclick="delClStep('${s.id}')">Remove</button>
-</div>`).join('');
-}
-
-function addClStep(){
-  const label=document.getElementById('new-cl-step').value.trim();
-  if(!label)return;
-  clTemplate.push({id:uid(),label});save();
-  document.getElementById('new-cl-step').value='';
-  renderClTemplate();toast('Step added');
-}
-function delClStep(id){clTemplate=clTemplate.filter(x=>x.id!==id);save();renderClTemplate();toast('Step removed')}
-
 function exportCSV(){
   if(!devices.length){toast('No devices to export','err');return}
-  const headers=['Device Name','Asset Tag','Service Tag','Department','Sub-Department','Device Type','Assigned User','Location','Status','Windows Version','BitLocker','Imaging Tech','Imaging Date'];
-  const rows=devices.map(d=>[d.deviceName,d.assetTag,d.serviceTag,d.department,d.subdepartment,d.deviceType,d.assignedUser,d.location,d.status,d.windowsVersion,d.bitlocker?'Yes':'No',d.imagingTech,new Date(d.imagingDate).toLocaleString()].map(v=>`"${String(v||'').replace(/"/g,'""')}"`).join(','));
-  download('devices.csv','text/csv',[headers.join(','),...rows].join('\n'));
+  const headers=['Device Name','Asset Tag','Asset Letter','Service Tag','Department','Sub-Department','Device Type','Assigned User','Location','Status','Windows Version','Imaging Tech','Imaging Date'];
+  const rows=devices.map(d=>[d.deviceName,d.assetTag,d.assetLetter||'',d.serviceTag,d.department,d.subdepartment,d.deviceType,d.assignedUser,d.location,d.status,d.windowsVersion,d.imagingTech,d.imagingDate?new Date(d.imagingDate).toLocaleDateString():''].map(v=>`"${String(v||'').replace(/"/g,'""')}"`).join(','));
+  download('cane-it-devices.csv','text/csv',[headers.join(','),...rows].join('\n'));
   toast('CSV exported');
 }
 
 function exportJSON(){
-  download('techops-backup.json','application/json',JSON.stringify({devices,departments,scripts,knowledge,techs,clTemplate,exportedAt:new Date().toISOString(),version:'2.1'},null,2));
+  download('cane-it-backup.json','application/json',JSON.stringify({devices,departments,scripts,knowledge,techs,checklists,exportedAt:new Date().toISOString(),version:'3.0'},null,2));
   toast('JSON backup exported');
 }
 
@@ -1542,7 +1625,8 @@ function importJSON(e){
       scripts=merge(scripts,data.scripts);
       knowledge=merge(knowledge,data.knowledge);
       techs=merge(techs,data.techs);
-      if(data.clTemplate)clTemplate=merge(clTemplate,data.clTemplate);
+      if(data.checklists)checklists=merge(checklists,data.checklists);
+      if(data.checklists2)checklists=merge(checklists,data.checklists2);
       save();toast('Import successful');renderDashboard();
     }catch{toast('Invalid JSON file','err')}
   };
@@ -1552,8 +1636,8 @@ function importJSON(e){
 function clearAll(){
   if(!confirm('Delete ALL data? This cannot be undone.'))return;
   if(prompt('Type CONFIRM to proceed:')!=='CONFIRM'){toast('Cancelled');return}
-  ['devices','departments','scripts','knowledge','techs','clTemplate'].forEach(k=>localStorage.removeItem(k));
-  devices=[];departments=[];scripts=[];knowledge=[];techs=[];clTemplate=[];
+  ['devices','departments','scripts','knowledge','techs','checklists2'].forEach(k=>localStorage.removeItem(k));
+  devices=[];departments=[];scripts=[];knowledge=[];techs=[];checklists=[];
   save();toast('All data cleared');renderDashboard();
 }
 
@@ -1572,4 +1656,4 @@ window.addEventListener('load',()=>{
 });
 </script>
 </body>
-</html>
+    </html>
