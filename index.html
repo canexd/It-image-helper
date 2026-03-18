@@ -123,15 +123,27 @@ tbody td{padding:11px 12px;color:var(--text2)}
 .modal-title{font-size:17px;font-weight:600;margin-bottom:20px}
 .modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}
 .bulk-grid{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);overflow:hidden}
-.bulk-row{display:grid;grid-template-columns:120px 130px 1fr 180px 80px;border-bottom:1px solid var(--border)}
+.bulk-row{display:grid;grid-template-columns:72px 120px 130px 1fr 180px 220px 80px;border-bottom:1px solid var(--border)}
 .bulk-row.hdr{background:var(--bg3)}
 .bulk-row.hdr span{padding:10px 12px;font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;display:block}
 .bulk-row input{background:transparent;border:none;border-right:1px solid var(--border);outline:none;padding:10px 12px;color:var(--text);width:100%;font-size:13px}
 .bulk-row input:focus{background:var(--accent-glow)}
 .gname{display:flex;align-items:center;padding:0 12px;border-right:1px solid var(--border);font-family:var(--mono);font-size:12px;color:var(--accent2)}
+.bulk-status{display:flex;flex-direction:column;justify-content:center;gap:4px;padding:8px 12px;border-right:1px solid var(--border);font-size:11px}
+.bulk-status .main{font-weight:600}
+.bulk-status .sub{color:var(--text3);line-height:1.4}
+.bulk-status.ok .main{color:var(--green)}
+.bulk-status.warn .main{color:var(--yellow)}
+.bulk-status.err .main{color:var(--red)}
 .rsave{display:flex;align-items:center;justify-content:center}
 .bulk-row.locked{background:rgba(16,185,129,0.03)}
 .bulk-row.locked input{pointer-events:none;color:var(--text3)}
+.bulk-tools{display:grid;grid-template-columns:1.1fr 0.9fr;gap:14px;margin-top:14px}
+.bulk-helper{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);padding:16px}
+.bulk-helper h3{font-size:13px;font-weight:600;margin-bottom:10px}
+.bulk-helper p{font-size:12px;color:var(--text3);line-height:1.5;margin-bottom:10px}
+.bulk-preview-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.bulk-preview-empty{color:var(--text3);font-size:12px}
 .tag{display:inline-flex;align-items:center;background:var(--bg4);border:1px solid var(--border);border-radius:4px;padding:2px 8px;font-size:11px;color:var(--text3);gap:4px;margin:2px}
 .tag-x{cursor:pointer;color:var(--text3);font-size:14px;line-height:1}.tag-x:hover{color:var(--red)}
 .tags-wrap{display:flex;flex-wrap:wrap;gap:4px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:6px 10px;cursor:text;min-height:42px}
@@ -191,7 +203,8 @@ tbody td{padding:11px 12px;color:var(--text2)}
 .grid-4,.grid-2{grid-template-columns:1fr}
 .form-row.c2,.form-row.c3,.form-row.c4{grid-template-columns:1fr}
 .drawer{width:100vw;right:-100vw}
-.bulk-row{grid-template-columns:100px 110px 1fr 140px 70px}
+  .bulk-tools{grid-template-columns:1fr}
+  .bulk-row{grid-template-columns:72px 100px 110px 1fr 140px 170px 70px}
 }
 </style>
 </head>
@@ -289,15 +302,37 @@ tbody td{padding:11px 12px;color:var(--text2)}
 <div class="form-row c3">
 <div class="field"><label>Imaging Tech</label><select id="bulk-tech"><option value="">-- Select --</option></select></div>
 <div class="field"><label>Imaging Date</label><input type="date" id="bulk-date" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:9px 12px;color:var(--text);outline:none;font-size:13px;width:100%"></div>
+<div class="field"><label>Session Preset</label><div style="display:flex;gap:6px"><select id="bulk-preset" onchange="applyBulkPreset(this.value)" style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:9px 12px;color:var(--text);outline:none;font-size:13px"><option value="">-- Recent presets --</option></select><button class="btn btn-secondary btn-sm" onclick="saveBulkPreset()">Save</button><button class="btn btn-danger btn-sm" onclick="deleteBulkPreset()">Del</button></div></div>
+</div>
+<div class="form-row c2">
 <div class="field"><label>Quick-Add Tech</label>
 <div style="display:flex;gap:6px">
 <input type="text" id="bulk-new-tech" placeholder="New tech name" style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:9px 12px;color:var(--text);outline:none;font-size:13px" onkeydown="if(event.key==='Enter')bulkAddTech()">
 <button class="btn btn-green btn-sm" onclick="bulkAddTech()">+ Add</button>
 </div></div>
+<div class="field"><label>Checklist Preview</label><div id="bulk-checklist-preview" class="bulk-preview-list"><span class="bulk-preview-empty">Choose department and device type to preview checklists.</span></div></div>
+</div>
+</div>
+<div class="bulk-tools">
+<div class="bulk-helper">
+<h3>Paste from Spreadsheet</h3>
+<p>Paste rows with columns in this order: asset letter, asset number, service tag, assigned user. Department, type, location, tech, and date still come from the session settings above.</p>
+<textarea id="bulk-paste" placeholder="A\t00123\tABC1234\tJane Doe" style="min-height:120px"></textarea>
+<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px"><button class="btn btn-secondary btn-sm" onclick="document.getElementById('bulk-paste').value=''">Clear</button><button class="btn btn-primary btn-sm" onclick="pasteBulkRows()">Add Rows</button></div>
+</div>
+<div class="bulk-helper">
+<h3>Auto-Increment Helper</h3>
+<p>Create multiple rows at once using sequential asset numbers and an optional shared asset letter.</p>
+<div class="form-row c3" style="margin-bottom:10px">
+<div class="field"><label>Asset Letter</label><input type="text" id="bulk-seq-letter" maxlength="3" placeholder="A" style="text-transform:uppercase" oninput="this.value=this.value.toUpperCase()"></div>
+<div class="field"><label>Start Asset #</label><input type="text" id="bulk-seq-start" placeholder="00123" oninput="this.value=this.value.replace(/\D/g,'')"></div>
+<div class="field"><label>Count</label><input type="number" id="bulk-seq-count" min="1" max="100" value="5"></div>
+</div>
+<div style="display:flex;justify-content:flex-end"><button class="btn btn-primary btn-sm" onclick="bulkAutoIncrement()">Generate Rows</button></div>
 </div>
 </div>
 <div class="bulk-grid" id="bulk-grid">
-<div class="bulk-row hdr"><span>Asset Tag</span><span>Service Tag</span><span>Assigned User</span><span>Generated Name</span><span></span></div>
+<div class="bulk-row hdr"><span>Letter</span><span>Asset Tag</span><span>Service Tag</span><span>Assigned User</span><span>Generated Name</span><span>Status</span><span></span></div>
 </div>
 <div style="margin-top:10px;color:var(--text3);font-size:12px;font-family:var(--mono)">↵ Enter on last field saves row and opens next</div>
 </div>
@@ -479,7 +514,8 @@ let devices=S.get('devices'),
     knowledge=S.get('knowledge'),
     techs=S.get('techs'),
     checklists=S.get('checklists2')||[],
-    kbCategories=S.get('kbCategories')||[];
+    kbCategories=S.get('kbCategories')||[],
+    bulkPresets=S.get('bulkPresets')||[];
 
 let bulkRows=[],editDevId=null,editScriptId=null,editKbId=null,editNamingId=null,editClId=null,drawerDevId=null,drawerTab='info',devSortField='imagingDate',devSortAsc=false;
 
@@ -487,7 +523,7 @@ function save(){
   S.set('devices',devices);S.set('departments',departments);
   S.set('scripts',scripts);S.set('knowledge',knowledge);
   S.set('techs',techs);S.set('checklists2',checklists);
-  S.set('kbCategories',kbCategories);
+  S.set('kbCategories',kbCategories);S.set('bulkPresets',bulkPresets);
 }
 
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
@@ -496,8 +532,20 @@ function toast(msg,type='ok'){const t=document.getElementById('toast');t.textCon
 function copyText(txt){if(!txt||!txt.trim())return;navigator.clipboard.writeText(txt).then(()=>toast('Copied!'))}
 function copyBtn(val){const safe=String(val||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");return`<button class="copy-btn" onclick="navigator.clipboard.writeText('${safe}').then(()=>toast('Copied!'))" title="Copy"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>`}
 function download(name,mime,data){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([data],{type:mime}));a.download=name;a.click()}
-function todayVal(){return new Date().toISOString().split('T')[0]}
+function pad2(n){return String(n).padStart(2,'0')}
+function localDateVal(d){return`${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`}
+function todayVal(){return localDateVal(new Date())}
+function normalizeStoredDate(v){
+  if(!v)return'';
+  if(typeof v==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(v))return v;
+  const dt=new Date(v);
+  return Number.isNaN(dt.getTime())?'':localDateVal(dt)
+}
+function displayDate(v){const ds=normalizeStoredDate(v);if(!ds)return'';const [y,m,d]=ds.split('-').map(Number);return new Date(y,m-1,d,12).toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})}
+function dateSortValue(v){return normalizeStoredDate(v)||''}
 function fullAsset(d){return d.assetLetter?d.assetLetter+d.assetTag:d.assetTag}
+function normalizeDevice(d){return{...d,assetLetter:String(d.assetLetter||'').toUpperCase(),imagingDate:normalizeStoredDate(d.imagingDate)}}
+devices=devices.map(normalizeDevice);
 
 function doLogin(){
   if(document.getElementById('login-pass').value==='1212'){
@@ -547,7 +595,7 @@ function sb(s){return s==='Active'?'bg':s==='Loaner'?'by':'br'}
 
 function renderDInfo(d){
   const fa=fullAsset(d);
-  const dt=d.imagingDate?new Date(d.imagingDate).toLocaleDateString():'—';
+  const dt=displayDate(d.imagingDate)||'—';
   document.getElementById('drawer-body').innerHTML=`
 <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--border)">
 <button class="btn btn-primary btn-sm" onclick="closeDrawer();openDeviceModal('${d.id}')">Edit Device</button>
@@ -636,6 +684,37 @@ function getPrefix(deptName,subId){const dept=departments.find(x=>x.name===deptN
 function genName(deptName,subId,asset,devType,override){if(override)return override;const dept=departments.find(x=>x.name===deptName);if(!dept||!asset)return'';return dept.template.replace('{PREFIX}',getPrefix(deptName,subId)).replace('{ASSET}',asset).replace('{TYPE}',typeCode(devType))}
 function techOpts(sel=''){return`<option value="">-- Tech --</option>`+techs.map(t=>`<option value="${esc(t.name)}"${t.name===sel?' selected':''}>${esc(t.name)}</option>`).join('')}
 function subOpts(deptName,sel=''){const dept=departments.find(x=>x.name===deptName);const dPrefix=dept?.prefix||'';return`<option value="">-- None (prefix: ${esc(dPrefix)}) --</option>`+(dept?.subdepts||[]).map(s=>`<option value="${esc(s.id)}"${s.id===sel?' selected':''}>${esc(s.name)} [${esc(dPrefix+s.prefix)}]</option>`).join('')}
+function bulkSession(){return{department:document.getElementById('bulk-dept')?.value||'',subdeptId:document.getElementById('bulk-sub')?.value||'',deviceType:document.getElementById('bulk-type')?.value||'',location:(document.getElementById('bulk-loc')?.value||'').trim(),imagingTech:document.getElementById('bulk-tech')?.value||'',imagingDate:document.getElementById('bulk-date')?.value||todayVal()}}
+function bulkChecklistMatches(dept,type){return checklists.filter(cl=>{const dm=cl.department===''||cl.department===dept;const tm=cl.deviceType===''||cl.deviceType==='All Devices'||cl.deviceType===type;return dm&&tm})}
+function renderBulkChecklistPreview(){const el=document.getElementById('bulk-checklist-preview');if(!el)return;const s=bulkSession();const list=(s.department&&s.deviceType)?bulkChecklistMatches(s.department,s.deviceType):[];el.innerHTML=list.length?list.map(cl=>`<span class="badge bb">${esc(cl.name)} · ${(cl.steps||[]).length} step${(cl.steps||[]).length!==1?'s':''}</span>`).join(''):'<span class="bulk-preview-empty">Choose department and device type to preview checklists.</span>'}
+function duplicateSummary({assetTag='',assetLetter='',deviceName='',excludeId='',includeBulkIndex=null}={}){
+  const assetKey=(String(assetLetter||'').trim().toUpperCase()+String(assetTag||'').trim()).toLowerCase();
+  const nameKey=String(deviceName||'').trim().toLowerCase();
+  const assetDup=assetKey?devices.find(d=>d.id!==excludeId&&String(fullAsset(d)).toLowerCase()===assetKey):null;
+  const nameDup=deviceName?devices.find(d=>d.id!==excludeId&&String(d.deviceName||'').toLowerCase()===nameKey):null;
+  const bulkAssetDup=assetKey?bulkRows.find((r,idx)=>idx!==includeBulkIndex&&!r.locked&&(String((r.assetLetter||'').trim().toUpperCase()+(r.asset||'')).toLowerCase()===assetKey)):null;
+  const bulkNameDup=nameKey?bulkRows.find((r,idx)=>idx!==includeBulkIndex&&!r.locked&&String(bulkName(r.asset||'')).toLowerCase()===nameKey):null;
+  return{assetDup,nameDup,bulkAssetDup,bulkNameDup}
+}
+function bulkRowState(row,i){
+  const session=bulkSession();const errs=[];const warns=[];
+  const assetLetter=String(row.assetLetter||'').trim().toUpperCase();const asset=String(row.asset||'').trim();const name=bulkName(asset);
+  if(!session.department)errs.push('Pick department');
+  if(!session.deviceType)errs.push('Pick type');
+  if(!asset)errs.push('Asset required');
+  if(asset&&!/^\d+$/.test(asset))errs.push('Asset must be numeric');
+  const dup=duplicateSummary({assetTag:asset,assetLetter,deviceName:name,includeBulkIndex:i});
+  if(dup.assetDup)errs.push(`Asset exists: ${fullAsset(dup.assetDup)}`);
+  else if(dup.bulkAssetDup)errs.push('Asset duplicated in bulk list');
+  if(name&&dup.nameDup)warns.push(`Name exists: ${dup.nameDup.deviceName}`);
+  else if(name&&dup.bulkNameDup)warns.push('Name duplicated in bulk list');
+  const cls=errs.length?'err':warns.length?'warn':'ok';
+  const main=errs.length?errs[0]:warns.length?warns[0]:'Ready to save';
+  const checklistList=(session.department&&session.deviceType)?bulkChecklistMatches(session.department,session.deviceType):[];
+  const sub=errs.length?errs.slice(1).concat(checklistList.length?[`${checklistList.length} checklist${checklistList.length!==1?'s':''} will attach`]:[]).join(' • '):[warns[1],checklistList.length?`${checklistList.length} checklist${checklistList.length!==1?'s':''} will attach`:null].filter(Boolean).join(' • ');
+  return{className:cls,main,sub,name,errors:errs,warnings:warns,checklists:checklistList}
+}
+function renderBulkPresetOptions(sel=''){const el=document.getElementById('bulk-preset');if(!el)return;el.innerHTML=`<option value="">-- Recent presets --</option>`+bulkPresets.map(p=>`<option value="${esc(p.id)}"${p.id===sel?' selected':''}>${esc(p.name)}</option>`).join('')}
 
 // SORT
 function sortDevices(field){
@@ -651,9 +730,9 @@ function renderDashboard(){
 <div class="stat-card green"><div class="stat-label">Loaners</div><div class="stat-val" style="color:var(--green)">${l}</div><div class="stat-sub">in circulation</div></div>
 <div class="stat-card yellow"><div class="stat-label">Scripts</div><div class="stat-val" style="color:var(--yellow)">${scripts.length}</div><div class="stat-sub">${knowledge.length} articles</div></div>
 <div class="stat-card purple"><div class="stat-label">Checklists</div><div class="stat-val" style="color:var(--purple)">${checklists.length}</div><div class="stat-sub">${r} retired devices</div></div>`;
-  const rec=[...active].sort((a,b)=>b.imagingDate-a.imagingDate).slice(0,6);
+  const rec=[...active].sort((a,b)=>dateSortValue(b.imagingDate).localeCompare(dateSortValue(a.imagingDate))).slice(0,6);
   document.getElementById('dash-recent').innerHTML=rec.length
-    ?`<table><thead><tr><th>Name</th><th>Department</th><th>Imaged</th></tr></thead><tbody>${rec.map(d=>`<tr onclick="openDrawer('${d.id}')"><td class="mono" style="color:var(--accent2)">${esc(d.deviceName)}</td><td>${esc(d.department)}</td><td style="color:var(--text3);font-size:12px">${d.imagingDate?new Date(d.imagingDate).toLocaleDateString():'—'}</td></tr>`).join('')}</tbody></table>`
+    ?`<table><thead><tr><th>Name</th><th>Department</th><th>Imaged</th></tr></thead><tbody>${rec.map(d=>`<tr onclick="openDrawer('${d.id}')"><td class="mono" style="color:var(--accent2)">${esc(d.deviceName)}</td><td>${esc(d.department)}</td><td style="color:var(--text3);font-size:12px">${displayDate(d.imagingDate)||'—'}</td></tr>`).join('')}</tbody></table>`
     :'<div style="color:var(--text3);font-size:13px">No active devices yet.</div>';
   const dc={};active.forEach(d=>{const k=d.department+(d.subdepartment?' › '+d.subdepartment:'');dc[k]=(dc[k]||0)+1});
   document.getElementById('dash-depts').innerHTML=Object.entries(dc).slice(0,8).map(([k,v])=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(37,45,61,0.5)"><span style="font-size:13px">${esc(k)}</span><span class="badge bb">${v}</span></div>`).join('')
@@ -681,7 +760,7 @@ function renderDevices(){
   });
   filtered.sort((a,b)=>{
     let av=a[devSortField]??'',bv=b[devSortField]??'';
-    if(devSortField==='imagingDate'){av=av||0;bv=bv||0;}
+    if(devSortField==='imagingDate'){av=dateSortValue(av);bv=dateSortValue(bv);}
     const cmp=typeof av==='number'?av-bv:String(av).localeCompare(String(bv));
     return devSortAsc?cmp:-cmp;
   });
@@ -694,7 +773,7 @@ function renderDevices(){
     const state=d.checklistState||{};
     const done=allSteps.filter(({clId,stepId})=>state[clId+'::'+stepId]?.checked).length;
     const pct=allSteps.length?Math.round((done/allSteps.length)*100):null;
-    const dateStr=d.imagingDate?new Date(d.imagingDate).toLocaleDateString():'—';
+    const dateStr=displayDate(d.imagingDate)||'—';
     return`<tr onclick="openDrawer('${d.id}')">
 <td class="mono" style="color:var(--accent2)">${esc(d.deviceName)}</td>
 <td class="mono">${esc(fullAsset(d))}</td>
@@ -715,7 +794,7 @@ function renderDevices(){
 function openDeviceModal(id){
   editDevId=id||null;const d=id?devices.find(x=>x.id===id):{};
   const hasSubs=d.department&&(departments.find(x=>x.name===d.department)?.subdepts||[]).length>0;
-  let dateVal=d.imagingDate?new Date(d.imagingDate).toISOString().split('T')[0]:todayVal();
+  let dateVal=normalizeStoredDate(d.imagingDate)||todayVal();
   openModal(id?'Edit Device':'Add Device',`
 <div class="form-row c2">
 <div class="field"><label>Department *</label><select id="dm-dept" onchange="dmDeptChange()"><option value="">-- Select --</option>${departments.map(dep=>`<option value="${esc(dep.name)}"${dep.name===d.department?' selected':''}>${esc(dep.name)}</option>`).join('')}</select></div>
@@ -755,9 +834,14 @@ function saveDevice(){
   if(!dept||!asset||!type){toast('Department, Asset Tag, and Type required.','err');return}
   const subId=document.getElementById('dm-sub').value;const subdept=(departments.find(x=>x.name===dept)?.subdepts||[]).find(x=>x.id===subId);
   const override=document.getElementById('dm-override').checked;const name=document.getElementById('dm-name').value;
-  const imgDateStr=document.getElementById('dm-imgdate').value;const imgDate=imgDateStr?new Date(imgDateStr).getTime():Date.now();
+  const imgDate=normalizeStoredDate(document.getElementById('dm-imgdate').value)||todayVal();
   const ex=editDevId?devices.find(x=>x.id===editDevId):{};
-  const obj={id:editDevId||uid(),department:dept,subdeptId:subId||'',subdepartment:subdept?.name||'',assetTag:asset,assetLetter:document.getElementById('dm-asset-letter').value,deviceType:type,serviceTag:document.getElementById('dm-service').value,deviceName:name||genName(dept,subId,asset,type),nameOverride:override,assignedUser:document.getElementById('dm-user').value,location:document.getElementById('dm-loc').value,status:document.getElementById('dm-status').value,windowsVersion:document.getElementById('dm-win').value,imagingTech:document.getElementById('dm-tech').value,imagingDate:imgDate,noteTimeline:ex.noteTimeline||[],checklistState:ex.checklistState||{}};
+  const assetLetter=document.getElementById('dm-asset-letter').value.trim().toUpperCase();
+  const finalName=name||genName(dept,subId,asset,type);
+  const dup=duplicateSummary({assetTag:asset,assetLetter,deviceName:finalName,excludeId:editDevId||''});
+  if(dup.assetDup){toast(`Asset tag already exists on ${dup.assetDup.deviceName}`,'err');return}
+  if(dup.nameDup){toast(`Device name already exists: ${dup.nameDup.deviceName}`,'err');return}
+  const obj={id:editDevId||uid(),department:dept,subdeptId:subId||'',subdepartment:subdept?.name||'',assetTag:asset,assetLetter,deviceType:type,serviceTag:document.getElementById('dm-service').value,deviceName:finalName,nameOverride:override,assignedUser:document.getElementById('dm-user').value,location:document.getElementById('dm-loc').value,status:document.getElementById('dm-status').value,windowsVersion:document.getElementById('dm-win').value,imagingTech:document.getElementById('dm-tech').value,imagingDate:imgDate,noteTimeline:ex.noteTimeline||[],checklistState:ex.checklistState||{}};
   if(editDevId){const i=devices.findIndex(x=>x.id===editDevId);if(i>=0)devices[i]=obj;}else devices.unshift(obj);
   save();closeModal();renderDevices();toast(editDevId?'Device updated':'Device added');
 }
@@ -864,19 +948,27 @@ function renderBulk(){
   const ts=document.getElementById('bulk-tech');const pt=ts.value;
   ts.innerHTML=`<option value="">-- Select --</option>`+techs.map(t=>`<option${t.name===pt?' selected':''}>${esc(t.name)}</option>`).join('');ts.value=pt;
   const di=document.getElementById('bulk-date');if(!di.value)di.value=todayVal();
-  if(pv)bulkDeptChange();renderBulkRows();
+  renderBulkPresetOptions(document.getElementById('bulk-preset')?.value||'');
+  if(pv)bulkDeptChange();else renderBulkChecklistPreview();
+  renderBulkRows();
 }
-function bulkDeptChange(){const dept=document.getElementById('bulk-dept').value;const sub=document.getElementById('bulk-sub');const subs=(departments.find(x=>x.name===dept)?.subdepts)||[];sub.innerHTML=`<option value="">-- None --</option>`+subs.map(s=>`<option value="${esc(s.id)}">${esc(s.name)} [${esc(s.prefix)}]</option>`).join('');sub.disabled=!subs.length;refreshBulkNames()}
+function bulkDeptChange(){const dept=document.getElementById('bulk-dept').value;const sub=document.getElementById('bulk-sub');const subs=(departments.find(x=>x.name===dept)?.subdepts)||[];sub.innerHTML=`<option value="">-- None --</option>`+subs.map(s=>`<option value="${esc(s.id)}">${esc(s.name)} [${esc(s.prefix)}]</option>`).join('');sub.disabled=!subs.length;refreshBulkNames();renderBulkChecklistPreview()}
 function bulkName(asset){return genName(document.getElementById('bulk-dept')?.value,document.getElementById('bulk-sub')?.value,asset,document.getElementById('bulk-type')?.value)}
 function renderBulkRows(){const grid=document.getElementById('bulk-grid');grid.querySelectorAll('.bulk-row:not(.hdr)').forEach(r=>r.remove());bulkRows.forEach((row,i)=>grid.appendChild(makeBulkRow(i,row)));if(!bulkRows.length||bulkRows[bulkRows.length-1].locked)addBulkRow()}
-function makeBulkRow(i,row){const div=document.createElement('div');div.className='bulk-row'+(row.locked?' locked':'');div.dataset.i=i;const name=bulkName(row.asset||'');div.innerHTML=`<input placeholder="Asset Tag" value="${esc(row.asset||'')}" data-f="asset" ${row.locked?'disabled':''} oninput="bInput(${i},this)" onkeydown="bKey(event,${i},'asset')"><input placeholder="Service Tag" value="${esc(row.st||'')}" data-f="st" ${row.locked?'disabled':''} oninput="bInput(${i},this)" onkeydown="bKey(event,${i},'st')"><input placeholder="Assigned User" value="${esc(row.user||'')}" data-f="user" ${row.locked?'disabled':''} oninput="bInput(${i},this)" onkeydown="bKey(event,${i},'user')"><div class="gname">${esc(name||'—')}</div><div class="rsave">${row.locked?'<span style="color:var(--green);font-size:18px;padding:0 12px">✓</span>':`<button class="btn btn-green btn-xs" style="margin:0 8px" onclick="saveBulkRow(${i})">Save</button>`}</div>`;return div}
-function bInput(i,inp){const f=inp.dataset.f;if(f==='asset')inp.value=inp.value.replace(/\D/g,'');bulkRows[i][f]=inp.value;const nd=inp.closest('.bulk-row').querySelector('.gname');if(nd)nd.textContent=bulkName(bulkRows[i].asset||'')||'—'}
-function bKey(e,i,f){if(e.key==='Enter'){if(f==='user')saveBulkRow(i);else{const nf={asset:'st',st:'user'}[f];const row=document.querySelectorAll('#bulk-grid .bulk-row:not(.hdr)')[i];if(row)row.querySelector(`input[data-f="${nf}"]`)?.focus()}}}
-function saveBulkRow(i){const row=bulkRows[i];const dept=document.getElementById('bulk-dept').value;const subId=document.getElementById('bulk-sub').value;const type=document.getElementById('bulk-type').value;const tech=document.getElementById('bulk-tech').value;const loc=document.getElementById('bulk-loc').value;const dateStr=document.getElementById('bulk-date').value;if(!dept||!type){toast('Set department and device type first','err');return}if(!row.asset){toast('Asset tag required','err');return}const subdept=(departments.find(x=>x.name===dept)?.subdepts||[]).find(x=>x.id===subId);const name=bulkName(row.asset);const imgDate=dateStr?new Date(dateStr).getTime():Date.now();devices.unshift({id:uid(),department:dept,subdeptId:subId||'',subdepartment:subdept?.name||'',assetTag:row.asset,assetLetter:'',deviceType:type,serviceTag:row.st||'',deviceName:name,assignedUser:row.user||'',location:loc,status:'Active',imagingTech:tech,imagingDate:imgDate,noteTimeline:[],checklistState:{}});save();bulkRows[i].locked=true;renderBulkRows();toast(`Saved: ${name}`)}
-function addBulkRow(){bulkRows.push({asset:'',st:'',user:'',locked:false});const grid=document.getElementById('bulk-grid');const row=makeBulkRow(bulkRows.length-1,bulkRows[bulkRows.length-1]);grid.appendChild(row);setTimeout(()=>row.querySelector('input')?.focus(),50)}
-function refreshBulkNames(){document.querySelectorAll('#bulk-grid .bulk-row:not(.hdr)').forEach(r=>{const i=parseInt(r.dataset.i);const nd=r.querySelector('.gname');if(nd&&!bulkRows[i]?.locked)nd.textContent=bulkName(bulkRows[i]?.asset||'')||'—'})}
+function updateBulkRow(i,field){const rows=document.querySelectorAll('#bulk-grid .bulk-row:not(.hdr)');const current=rows[i];if(!current||!bulkRows[i])return;const next=makeBulkRow(i,bulkRows[i]);current.replaceWith(next);if(field&&!bulkRows[i].locked){const inp=next.querySelector(`input[data-f="${field}"]`);if(inp){inp.focus();inp.selectionStart=inp.selectionEnd=inp.value.length}}}
+function makeBulkRow(i,row){const div=document.createElement('div');const state=bulkRowState(row,i);div.className='bulk-row'+(row.locked?' locked':'');div.dataset.i=i;div.innerHTML=`<input placeholder="A" value="${esc(row.assetLetter||'')}" data-f="assetLetter" maxlength="3" style="text-transform:uppercase" ${row.locked?'disabled':''} oninput="bInput(${i},this)" onkeydown="bKey(event,${i},'assetLetter')"><input placeholder="Asset Tag" value="${esc(row.asset||'')}" data-f="asset" ${row.locked?'disabled':''} oninput="bInput(${i},this)" onkeydown="bKey(event,${i},'asset')"><input placeholder="Service Tag" value="${esc(row.st||'')}" data-f="st" ${row.locked?'disabled':''} oninput="bInput(${i},this)" onkeydown="bKey(event,${i},'st')"><input placeholder="Assigned User" value="${esc(row.user||'')}" data-f="user" ${row.locked?'disabled':''} oninput="bInput(${i},this)" onkeydown="bKey(event,${i},'user')"><div class="gname">${esc(state.name||'—')}</div><div class="bulk-status ${state.className}"><div class="main">${esc(row.locked?'Saved':state.main)}</div><div class="sub">${esc(row.locked?`Saved ${displayDate(row.savedAt)||todayVal()}`:(state.sub||'Looks good'))}</div></div><div class="rsave">${row.locked?'<span style="color:var(--green);font-size:18px;padding:0 12px">✓</span>':`<button class="btn btn-green btn-xs" style="margin:0 8px" onclick="saveBulkRow(${i})" ${state.errors.length?'disabled':''}>Save</button>`}</div>`;return div}
+function bInput(i,inp){const f=inp.dataset.f;if(f==='asset')inp.value=inp.value.replace(/\D/g,'');if(f==='assetLetter')inp.value=inp.value.toUpperCase().replace(/[^A-Z]/g,'');bulkRows[i][f]=inp.value;updateBulkRow(i,f)}
+function bKey(e,i,f){if(e.key==='Enter'){if(f==='user')saveBulkRow(i);else{const nf={assetLetter:'asset',asset:'st',st:'user'}[f];const row=document.querySelectorAll('#bulk-grid .bulk-row:not(.hdr)')[i];if(row)row.querySelector(`input[data-f="${nf}"]`)?.focus()}}}
+function saveBulkRow(i){const row=bulkRows[i];const session=bulkSession();const state=bulkRowState(row,i);if(state.errors.length){toast(state.errors[0],'err');return}const subdept=(departments.find(x=>x.name===session.department)?.subdepts||[]).find(x=>x.id===session.subdeptId);const obj={id:uid(),department:session.department,subdeptId:session.subdeptId||'',subdepartment:subdept?.name||'',assetTag:row.asset,assetLetter:(row.assetLetter||'').trim().toUpperCase(),deviceType:session.deviceType,serviceTag:row.st||'',deviceName:state.name,assignedUser:row.user||'',location:session.location,status:'Active',imagingTech:session.imagingTech,imagingDate:normalizeStoredDate(session.imagingDate)||todayVal(),noteTimeline:[],checklistState:{}};devices.unshift(normalizeDevice(obj));save();bulkRows[i]={...bulkRows[i],locked:true,savedAt:devices[0].imagingDate};renderBulkRows();toast(`Saved: ${state.name}`)}
+function addBulkRow(seed={}){bulkRows.push({assetLetter:'',asset:'',st:'',user:'',locked:false,...seed});const grid=document.getElementById('bulk-grid');const row=makeBulkRow(bulkRows.length-1,bulkRows[bulkRows.length-1]);grid.appendChild(row);setTimeout(()=>row.querySelector('input:not([disabled])')?.focus(),50)}
+function refreshBulkNames(){renderBulkChecklistPreview();renderBulkRows()}
 function clearBulk(){if(!confirm('Clear session?'))return;bulkRows=[];renderBulkRows()}
 function bulkAddTech(){const inp=document.getElementById('bulk-new-tech');const name=inp?.value.trim();if(!name){toast('Enter a tech name','err');return}if(techs.find(t=>t.name===name)){toast('Tech already exists','err');return}techs.push({id:uid(),name});save();const sel=document.getElementById('bulk-tech');const opt=document.createElement('option');opt.value=name;opt.textContent=name;opt.selected=true;sel.appendChild(opt);inp.value='';toast(`Tech "${name}" added`)}
+function pasteBulkRows(){const raw=document.getElementById('bulk-paste').value.trim();if(!raw){toast('Paste spreadsheet rows first','err');return}const lines=raw.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);const parsed=[];for(const line of lines){const cols=(line.includes('\t')?line.split('\t'):line.split(',')).map(x=>x.trim());if(cols.length===1&&/^[A-Za-z]?\d+$/.test(cols[0])){const rawVal=cols[0].toUpperCase();parsed.push({assetLetter:rawVal.replace(/\d/g,''),asset:rawVal.replace(/\D/g,''),st:'',user:''});continue}parsed.push({assetLetter:(cols[0]||'').toUpperCase().replace(/[^A-Z]/g,''),asset:(cols[1]||'').replace(/\D/g,''),st:cols[2]||'',user:cols[3]||''})}if(bulkRows.length===1&&!bulkRows[0].locked&&!bulkRows[0].asset&&!bulkRows[0].assetLetter&&!bulkRows[0].st&&!bulkRows[0].user)bulkRows=[];parsed.forEach(r=>bulkRows.push({assetLetter:r.assetLetter,asset:r.asset,st:r.st,user:r.user,locked:false}));document.getElementById('bulk-paste').value='';renderBulkRows();toast(`${parsed.length} row${parsed.length!==1?'s':''} added`)}
+function bulkAutoIncrement(){const start=document.getElementById('bulk-seq-start').value.replace(/\D/g,'');const count=Math.min(100,Math.max(1,parseInt(document.getElementById('bulk-seq-count').value||'1',10)));const letter=document.getElementById('bulk-seq-letter').value.trim().toUpperCase().replace(/[^A-Z]/g,'');if(!start){toast('Enter a starting asset number','err');return}const width=start.length;const base=parseInt(start,10);if(Number.isNaN(base)){toast('Invalid starting asset number','err');return}if(bulkRows.length===1&&!bulkRows[0].locked&&!bulkRows[0].asset&&!bulkRows[0].assetLetter&&!bulkRows[0].st&&!bulkRows[0].user)bulkRows=[];for(let offset=0;offset<count;offset++)bulkRows.push({assetLetter:letter,asset:String(base+offset).padStart(width,'0'),st:'',user:'',locked:false});renderBulkRows();toast(`${count} row${count!==1?'s':''} generated`)}
+function saveBulkPreset(){const s=bulkSession();if(!s.department||!s.deviceType){toast('Pick department and type first','err');return}const subName=(departments.find(d=>d.name===s.department)?.subdepts||[]).find(x=>x.id===s.subdeptId)?.name;const name=[s.department,subName,s.deviceType].filter(Boolean).join(' • ');const existing=bulkPresets.find(p=>p.name===name);const preset={id:existing?.id||uid(),name,createdAt:Date.now(),...s};if(existing){Object.assign(existing,preset)}else bulkPresets.unshift(preset);bulkPresets=bulkPresets.slice(0,8);save();renderBulkPresetOptions(preset.id);toast(`Preset saved: ${name}`)}
+function applyBulkPreset(id){if(!id)return;const p=bulkPresets.find(x=>x.id===id);if(!p)return;document.getElementById('bulk-dept').value=p.department||'';bulkDeptChange();document.getElementById('bulk-sub').value=p.subdeptId||'';document.getElementById('bulk-type').value=p.deviceType||'';document.getElementById('bulk-loc').value=p.location||'';document.getElementById('bulk-tech').value=p.imagingTech||'';document.getElementById('bulk-date').value=normalizeStoredDate(p.imagingDate)||todayVal();refreshBulkNames();toast(`Preset loaded: ${p.name}`)}
+function deleteBulkPreset(){const sel=document.getElementById('bulk-preset');const id=sel?.value;if(!id){toast('Select a preset first','err');return}const p=bulkPresets.find(x=>x.id===id);bulkPresets=bulkPresets.filter(x=>x.id!==id);save();renderBulkPresetOptions();toast(`Preset deleted: ${p?.name||id}`)}
 
 // SCRIPTS
 function renderScripts(){
@@ -1031,7 +1123,7 @@ function fillTicketFieldsFromDevice(d){
   document.getElementById('tkt-user').value=d.assignedUser||'';
   document.getElementById('tkt-dept').value=d.department||'';
   if(d.imagingTech){const sel=document.getElementById('tkt-tech');for(let o of sel.options){if(o.value===d.imagingTech){o.selected=true;break}}}
-  if(d.imagingDate)document.getElementById('tkt-date').value=new Date(d.imagingDate).toISOString().split('T')[0];
+  if(d.imagingDate)document.getElementById('tkt-date').value=normalizeStoredDate(d.imagingDate);
 }
 
 function openTicketFromDevice(id){
@@ -1061,7 +1153,7 @@ function updateTicket(){
     'reimage-required':'Device requires reimage to resolve the reported issue. Backed up user data and prepared rebuild steps.',
     'loaner-issued':'Issued this device as a temporary loaner while the primary device is being repaired.'
   };
-  const dateStr=dateVal?new Date(dateVal+'T12:00:00').toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}):'';
+  const dateStr=displayDate(dateVal);
   if(!name&&!asset){document.getElementById('ticket-out').textContent='Fill in the fields on the left to generate a ticket note.';return}
   let lines=[];
   lines.push(`Device Imaging — ${dateStr||'N/A'}`);
@@ -1114,10 +1206,10 @@ function updateADDesc(){const computer=document.getElementById('addesc-computer'
 
 function runFinder(){
   const dept=document.getElementById('finder-dept')?.value;const status=document.getElementById('finder-status')?.value;const type=document.getElementById('finder-type')?.value;const from=document.getElementById('finder-from')?.value;const to=document.getElementById('finder-to')?.value;
-  const results=devices.filter(d=>{if(dept&&d.department!==dept)return false;if(status&&d.status!==status)return false;if(type&&d.deviceType!==type)return false;if(from&&d.imagingDate<new Date(from).getTime())return false;if(to&&d.imagingDate>new Date(to).getTime()+86400000)return false;return true});
+  const results=devices.filter(d=>{const dv=normalizeStoredDate(d.imagingDate);if(dept&&d.department!==dept)return false;if(status&&d.status!==status)return false;if(type&&d.deviceType!==type)return false;if(from&&dv&&dv<from)return false;if(to&&dv&&dv>to)return false;return true});
   const el=document.getElementById('finder-results');
   if(!results.length){el.innerHTML='<div style="color:var(--text3);font-size:13px;padding:12px 0">No devices match.</div>';return}
-  el.innerHTML=`<table style="margin-top:12px"><thead><tr><th>Name</th><th>Asset Tag</th><th>Type</th><th>Status</th><th>Dept</th><th>Imaged</th></tr></thead><tbody>${results.slice(0,25).map(d=>`<tr onclick="openDrawer('${d.id}')"><td class="mono" style="color:var(--accent2)">${esc(d.deviceName)}</td><td class="mono">${esc(fullAsset(d))}</td><td>${esc(d.deviceType)}</td><td><span class="badge ${sb(d.status)}">${esc(d.status)}</span></td><td>${esc(d.department)}</td><td style="font-size:12px;color:var(--text3)">${d.imagingDate?new Date(d.imagingDate).toLocaleDateString():'—'}</td></tr>`).join('')}</tbody></table>${results.length>25?`<div style="color:var(--text3);font-size:12px;margin-top:8px">…and ${results.length-25} more</div>`:''}`;
+  el.innerHTML=`<table style="margin-top:12px"><thead><tr><th>Name</th><th>Asset Tag</th><th>Type</th><th>Status</th><th>Dept</th><th>Imaged</th></tr></thead><tbody>${results.slice(0,25).map(d=>`<tr onclick="openDrawer('${d.id}')"><td class="mono" style="color:var(--accent2)">${esc(d.deviceName)}</td><td class="mono">${esc(fullAsset(d))}</td><td>${esc(d.deviceType)}</td><td><span class="badge ${sb(d.status)}">${esc(d.status)}</span></td><td>${esc(d.department)}</td><td style="font-size:12px;color:var(--text3)">${displayDate(d.imagingDate)||'—'}</td></tr>`).join('')}</tbody></table>${results.length>25?`<div style="color:var(--text3);font-size:12px;margin-top:8px">…and ${results.length-25} more</div>`:''}`;
 }
 
 // EXPORTS
@@ -1125,13 +1217,14 @@ function renderExports(){renderTechs()}
 function renderTechs(){const el=document.getElementById('techs-list');if(!techs.length){el.innerHTML='<div style="color:var(--text3);font-size:13px;margin-bottom:8px">No techs added yet.</div>';return}el.innerHTML=techs.map(t=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(37,45,61,0.5)"><span style="font-size:13px">${esc(t.name)}</span><button class="btn btn-danger btn-xs" onclick="delTech('${t.id}')">Remove</button></div>`).join('')}
 function addTech(){const n=document.getElementById('new-tech').value.trim();if(!n)return;techs.push({id:uid(),name:n});save();document.getElementById('new-tech').value='';renderTechs();toast('Tech added')}
 function delTech(id){techs=techs.filter(x=>x.id!==id);save();renderTechs();toast('Removed')}
-function exportCSV(){if(!devices.length){toast('No devices to export','err');return}const headers=['Device Name','Asset Tag','Asset Letter','Service Tag','Department','Sub-Department','Device Type','Assigned User','Location','Status','Windows Version','Imaging Tech','Imaging Date'];const rows=devices.map(d=>[d.deviceName,fullAsset(d),d.assetLetter||'',d.serviceTag,d.department,d.subdepartment,d.deviceType,d.assignedUser,d.location,d.status,d.windowsVersion,d.imagingTech,d.imagingDate?new Date(d.imagingDate).toLocaleDateString():''].map(v=>`"${String(v||'').replace(/"/g,'""')}"`).join(','));download('cane-it-devices.csv','text/csv',[headers.join(','),...rows].join('\n'));toast('CSV exported')}
-function exportJSON(){download('cane-it-backup.json','application/json',JSON.stringify({devices,departments,scripts,knowledge,techs,checklists,kbCategories,exportedAt:new Date().toISOString(),version:'3.1'},null,2));toast('JSON backup exported')}
-function importJSON(e){const file=e.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=ev=>{try{const data=JSON.parse(ev.target.result);const merge=(arr,src)=>{if(!src)return arr;const ids=new Set(arr.map(x=>x.id));return[...arr,...src.filter(x=>!ids.has(x.id))]};devices=merge(devices,data.devices);departments=merge(departments,data.departments);scripts=merge(scripts,data.scripts);knowledge=merge(knowledge,data.knowledge);techs=merge(techs,data.techs);if(data.checklists)checklists=merge(checklists,data.checklists);if(data.checklists2)checklists=merge(checklists,data.checklists2);if(data.kbCategories)kbCategories=merge(kbCategories,data.kbCategories);save();toast('Import successful');renderDashboard();}catch{toast('Invalid JSON file','err')}};reader.readAsText(file);e.target.value=''}
-function clearAll(){if(!confirm('Delete ALL data?'))return;if(prompt('Type CONFIRM to proceed:')!=='CONFIRM'){toast('Cancelled');return}['devices','departments','scripts','knowledge','techs','checklists2','kbCategories'].forEach(k=>localStorage.removeItem(k));devices=[];departments=[];scripts=[];knowledge=[];techs=[];checklists=[];kbCategories=[];save();toast('All data cleared');renderDashboard()}
+function exportCSV(){if(!devices.length){toast('No devices to export','err');return}const headers=['Device Name','Asset Tag','Asset Letter','Service Tag','Department','Sub-Department','Device Type','Assigned User','Location','Status','Windows Version','Imaging Tech','Imaging Date'];const rows=devices.map(d=>[d.deviceName,fullAsset(d),d.assetLetter||'',d.serviceTag,d.department,d.subdepartment,d.deviceType,d.assignedUser,d.location,d.status,d.windowsVersion,d.imagingTech,displayDate(d.imagingDate)||''].map(v=>`"${String(v||'').replace(/"/g,'""')}"`).join(','));download('cane-it-devices.csv','text/csv',[headers.join(','),...rows].join('\n'));toast('CSV exported')}
+function exportJSON(){download('cane-it-backup.json','application/json',JSON.stringify({devices,departments,scripts,knowledge,techs,checklists,kbCategories,bulkPresets,exportedAt:new Date().toISOString(),version:'3.2'},null,2));toast('JSON backup exported')}
+function importJSON(e){const file=e.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=ev=>{try{const data=JSON.parse(ev.target.result);const merge=(arr,src)=>{if(!src)return arr;const ids=new Set(arr.map(x=>x.id));return[...arr,...src.filter(x=>!ids.has(x.id))]};devices=merge(devices,(data.devices||[]).map(normalizeDevice));departments=merge(departments,data.departments);scripts=merge(scripts,data.scripts);knowledge=merge(knowledge,data.knowledge);techs=merge(techs,data.techs);if(data.checklists)checklists=merge(checklists,data.checklists);if(data.checklists2)checklists=merge(checklists,data.checklists2);if(data.kbCategories)kbCategories=merge(kbCategories,data.kbCategories);if(data.bulkPresets)bulkPresets=merge(bulkPresets,data.bulkPresets).slice(0,8);save();toast('Import successful');renderDashboard();}catch{toast('Invalid JSON file','err')}};reader.readAsText(file);e.target.value=''}
+function clearAll(){if(!confirm('Delete ALL data?'))return;if(prompt('Type CONFIRM to proceed:')!=='CONFIRM'){toast('Cancelled');return}['devices','departments','scripts','knowledge','techs','checklists2','kbCategories','bulkPresets'].forEach(k=>localStorage.removeItem(k));devices=[];departments=[];scripts=[];knowledge=[];techs=[];checklists=[];kbCategories=[];bulkPresets=[];save();toast('All data cleared');renderDashboard()}
 
 function init(){
   if(window.innerWidth<768)document.getElementById('mobile-menu-btn').style.display='flex';
+  save();
   renderDashboard();
 }
 
